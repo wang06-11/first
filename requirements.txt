@@ -1,0 +1,6 @@
+# NewsPulse 依赖（Python 3.10+）
+feedparser>=6.0
+requests>=2.31
+PyYAML>=6.0
+apscheduler>=3.10
+tzlocal>=5.0

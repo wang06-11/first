@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#3b6fb5" />
+<title>NewsPulse 每日资讯</title>
+<style>
+  :root{
+    --bg:#f5f7fb; --card:#ffffff; --ink:#1f2937; --sub:#6b7280;
+    --line:#e6ebf2; --primary:#3b6fb5; --primary-soft:#eaf1fa;
+    --red:#d9534f; --safe:env(safe-area-inset-bottom);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);font-size:16px;line-height:1.55;
+    padding-bottom:calc(24px + var(--safe));
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 14px}
+  header.top{
+    position:sticky;top:0;z-index:20;background:var(--bg);
+    padding:14px 14px 10px;border-bottom:1px solid var(--line);
+  }
+  .title-row{display:flex;align-items:center;gap:8px}
+  .title-row h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.5px}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--primary);display:inline-block}
+  .meta{color:var(--sub);font-size:13px;margin-top:2px}
+  .controls{display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap}
+  .search{
+    flex:1;min-width:140px;height:44px;border:1px solid var(--line);border-radius:12px;
+    padding:0 12px;font-size:16px;background:var(--card);color:var(--ink);
+  }
+  .iconbtn{
+    width:44px;height:44px;border:1px solid var(--line);border-radius:12px;background:var(--card);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;
+  }
+  .iconbtn:active{background:var(--primary-soft)}
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{
+    flex:none;padding:8px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);
+    font-size:14px;color:var(--sub);cursor:pointer;white-space:nowrap;
+  }
+  .chip.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .list{margin:8px 0 24px}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:14px 16px;margin:10px 0;box-shadow:0 1px 2px rgba(20,40,80,.04);
+  }
+  .card .badges{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+  .badge{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--primary-soft);color:var(--primary);font-weight:600}
+  .src{font-size:12px;color:var(--sub)}
+  .score{font-size:12px;color:var(--sub);margin-left:auto}
+  .card h2{font-size:17px;margin:2px 0 8px;font-weight:700;line-height:1.4}
+  .card h2 a{color:var(--ink);text-decoration:none}
+  ul.pts{margin:6px 0 0;padding-left:18px;color:#374151;font-size:14.5px}
+  ul.pts li{margin:3px 0}
+  .take{margin-top:8px;font-size:13.5px;color:var(--primary);background:var(--primary-soft);
+    padding:8px 10px;border-radius:10px}
+  .empty{text-align:center;color:var(--sub);padding:60px 20px}
+  /* settings drawer */
+  .drawer-mask{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:40;display:none}
+  .drawer{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);
+    border-radius:18px 18px 0 0;padding:18px 16px calc(20px + var(--safe));display:none;max-height:80vh;overflow:auto}
+  .drawer h3{margin:0 0 12px;font-size:17px}
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 2px;border-bottom:1px solid var(--line)}
+  .toggle-row .name{font-size:15px}
+  .sw{width:48px;height:28px;border-radius:999px;background:var(--line);position:relative;transition:.2s;flex:none}
+  .sw.on{background:var(--primary)}
+  .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+  .sw.on::after{left:23px}
+  .drawer .hint{color:var(--sub);font-size:13px;margin-top:14px;line-height:1.6}
+  footer{text-align:center;color:var(--sub);font-size:12px;padding:6px 0 18px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="title-row">
+      <span class="dot"></span>
+      <h1>NewsPulse 每日资讯</h1>
+    </div>
+    <div class="meta" id="meta">加载中…</div>
+    <div class="controls">
+      <input class="search" id="search" type="search" placeholder="搜索标题/关键词" />
+      <div class="iconbtn" id="refreshBtn" title="刷新">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b6fb5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+      </div>
+      <div class="iconbtn" id="settingsBtn" title="设置">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b6fb5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="list" id="list"></div>
+  <div class="empty" id="empty" style="display:none">
+    <p>暂无数据。</p>
+    <p>请先运行 <code>python run.py --once</code> 生成今日资讯，<br/>或访问生成的 <code>data/latest.html</code>。</p>
+  </div>
+</main>
+
+<footer>NewsPulse · 多领域 · 有深度 · 每日定时推送</footer>
+
+<!-- 设置抽屉 -->
+<div class="drawer-mask" id="mask"></div>
+<div class="drawer" id="drawer">
+  <h3>显示设置（仅本机视图偏好）</h3>
+  <div id="toggles"></div>
+  <div class="hint">提示：把本页「添加到主屏幕」即可像 App 一样在手机打开。<br/>
+  推送时间与内容领域请在项目 <code>config.yaml</code> 中配置后重新生成。</div>
+</div>
+
+<script>
+const DIGEST = {"date": "2026-08-24", "generated_at": "2026-08-24T08:00:00+08:00", "total": 12, "categories": [{"id": "tech_ai", "name": "科技与 AI", "count": 3}, {"id": "finance", "name": "财经与商业", "count": 2}, {"id": "world", "name": "国际与地缘", "count": 2}, {"id": "science", "name": "科学与自然", "count": 2}, {"id": "culture", "name": "文化与思想", "count": 2}, {"id": "society", "name": "社会与深度", "count": 1}], "items": [{"title": "开源大模型推理成本一年下降 10 倍，端侧部署成主流", "summary": "多家机构报告显示，同等质量下大模型推理单价较去年下降约 90%，推动手机与 PC 本地部署。", "points": ["推理芯片与蒸馏技术叠加，单位 token 成本骤降", "端侧 7B 级模型已可在消费级设备流畅运行", "对隐私与离线场景是结构性利好"], "takeaway": "端侧 AI 正在从概念走向默认选项。", "link": "https://example.com/t1", "source": "The Verge", "category": "tech_ai", "category_name": "科技与 AI", "score": 94.0, "published": "2026-08-24T07:10:00Z", "ai": true}, {"title": "AI 编程助手在大型代码库中的采用率突破 60%", "summary": "一项面向开发者的调研显示，超过六成团队已将 AI 编码工具纳入日常流程。", "points": ["采用率同比上升近一倍", "代码审查环节收益最明显", "资深工程师使用更克制，新人增益更大"], "takeaway": "AI 编码已成工程基础设施。", "link": "https://example.com/t2", "source": "Hacker News", "category": "tech_ai", "category_name": "科技与 AI", "score": 90.0, "published": "2026-08-24T06:40:00Z", "ai": true}, {"title": "芯片制程逼近物理极限，先进封装成新战场", "summary": "当单片制程放缓，台积电、英特尔将竞争重心转向 3D 封装与 chiplet。", "points": ["制程红利递减，封装重要性上升", "chiplet 降低单 die 良率压力", "地缘政治让封装产能同样敏感"], "takeaway": "摩尔定律的延续越来越靠「拼装」而非「雕刻」。", "link": "https://example.com/t3", "source": "MIT Tech Review", "category": "tech_ai", "category_name": "科技与 AI", "score": 88.0, "published": "2026-08-24T05:20:00Z", "ai": true}, {"title": "全球主要央行释放降息信号，风险资产普涨", "summary": "在通胀回落背景下，多家央行暗示宽松，市场情绪转暖。", "points": ["宽松预期推动股市与加密资产上行", "但若增长走弱，宽松或难撑估值", "汇率波动值得关注"], "takeaway": "流动性交易回归，但基本面仍是隐忧。", "link": "https://example.com/f1", "source": "The Economist", "category": "finance", "category_name": "财经与商业", "score": 86.0, "published": "2026-08-24T04:50:00Z", "ai": true}, {"title": "企业 AI 支出首超传统 IT 试点预算", "summary": "季度财报电话会提及 AI 的次数创新高，资本开支结构生变。", "points": ["AI 从试点走向规模采购", "云厂商算力收入提速", "ROI 衡量仍是管理层难题"], "takeaway": "IT 预算的天平明显倾斜。", "link": "https://example.com/f2", "source": "NPR Business", "category": "finance", "category_name": "财经与商业", "score": 82.0, "published": "2026-08-24T03:30:00Z", "ai": true}, {"title": "多国就公海保护达成新框架，覆盖面积创新高", "summary": "谈判就扩大海洋保护区达成一致，被视为气候与生物多样性双重进展。", "points": ["保护海域面积大幅扩张", "执法与资金仍是落地难点", "对渔业与航运有中长期影响"], "takeaway": "全球治理在分歧中推进了一步。", "link": "https://example.com/w1", "source": "BBC World", "category": "world", "category_name": "国际与地缘", "score": 84.0, "published": "2026-08-24T02:10:00Z", "ai": true}, {"title": "关键矿产供应链重组，区域化趋势明显", "summary": "电池与半导体所需矿产的贸易路线正在重构。", "points": ["资源国议价能力上升", "回收与替代材料受重视", "地缘风险推高库存意愿"], "takeaway": "谁掌握矿产，谁握住转型命脉。", "link": "https://example.com/w2", "source": "The Guardian", "category": "world", "category_name": "国际与地缘", "score": 80.0, "published": "2026-08-24T01:40:00Z", "ai": true}, {"title": "詹姆斯·韦伯望远镜观测到最遥远星系的清晰结构", "summary": "新数据将宇宙再电离时期的研究向前推进。", "points": ["分辨率提升揭示早期星系形态", "支持现有宇宙学模型", "也带来新的未解问题"], "takeaway": "我们看得越远，问题越新。", "link": "https://example.com/s1", "source": "Nature", "category": "science", "category_name": "科学与自然", "score": 89.0, "published": "2026-08-24T00:50:00Z", "ai": true}, {"title": "可降解电池材料研发取得进展，减少重金属污染", "summary": "实验室阶段材料在性能与环保间取得更好平衡。", "points": ["有望降低回收难度", "成本仍需压降", "量产是关键关卡"], "takeaway": "绿色电池不止于用电侧。", "link": "https://example.com/s2", "source": "Science Daily", "category": "science", "category_name": "科学与自然", "score": 81.0, "published": "2026-08-23T23:30:00Z", "ai": true}, {"title": "长文：当「效率」成为唯一价值，我们失去了什么", "summary": "一篇评论反思社会对效率的崇拜及其隐性代价。", "points": ["效率叙事挤压了冗余与试错", "慢价值在创新中不可或缺", "组织需要为「无用」留空间"], "takeaway": "有时候，慢一点才更快。", "link": "https://example.com/c1", "source": "The Atlantic", "category": "culture", "category_name": "文化与思想", "score": 83.0, "published": "2026-08-23T22:00:00Z", "ai": true}, {"title": "为什么深度阅读正在成为一种稀缺能力", "summary": "注意力碎片化时代，长文本理解力需要刻意练习。", "points": ["算法偏好短刺激", "深度阅读提升迁移能力", "可从每天 20 分钟重建"], "takeaway": "专注力是当代最被低估的竞争力。", "link": "https://example.com/c2", "source": "Aeon", "category": "culture", "category_name": "文化与思想", "score": 79.0, "published": "2026-08-23T21:00:00Z", "ai": true}, {"title": "调查：部分「智能」家电的数据被悄悄上传第三方", "summary": "ProPublica 调查发现多款设备在用户不知情下共享使用数据。", "points": ["默认开启的上传难以关闭", "隐私条款晦涩冗长", "监管滞后于产品迭代"], "takeaway": "便利的代价，不该是看不见的同意。", "link": "https://example.com/so1", "source": "ProPublica", "category": "society", "category_name": "社会与深度", "score": 85.0, "published": "2026-08-23T20:00:00Z", "ai": true}]};
+
+const PALETTE = ["#3b6fb5","#2f9e8f","#b5703a","#7a5cc0","#c0567a","#4a7a3a","#c08a2f"];
+const catColor = {};
+function colorFor(id, i){ if(!(id in catColor)) catColor[id]=PALETTE[i%PALETTE.length]; return catColor[id]; }
+
+let DATA = null;
+let hidden = loadHidden();
+let activeCat = "all";
+let query = "";
+
+function loadHidden(){
+  try{ return JSON.parse(localStorage.getItem("np_hidden")||"{}"); }catch(e){ return {}; }
+}
+function saveHidden(){ localStorage.setItem("np_hidden", JSON.stringify(hidden)); }
+
+function esc(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function render(){
+  if(!DATA){ document.getElementById("meta").textContent="无数据"; return; }
+  const cats = DATA.categories||[];
+  document.getElementById("meta").textContent =
+    `${DATA.date} · 共 ${DATA.total} 条 · 覆盖 ${cats.length} 个领域` + (DATA.items[0]&&DATA.items[0].ai?" · AI 摘要":"");
+  // chips
+  const chips = document.getElementById("chips");
+  chips.innerHTML = "";
+  const mk=(label,key)=>{
+    const c=document.createElement("div");
+    c.className="chip"+(activeCat===key?" on":""); c.textContent=label;
+    c.onclick=()=>{activeCat=key; render();};
+    chips.appendChild(c);
+  };
+  mk("全部","all");
+  cats.forEach((c,i)=>mk(c.name,c.id));
+  // list
+  const list=document.getElementById("list"); list.innerHTML="";
+  let items=(DATA.items||[]).filter(it=>!hidden[it.category]);
+  if(activeCat!=="all") items=items.filter(it=>it.category===activeCat);
+  if(query){ const q=query.toLowerCase();
+    items=items.filter(it=>(it.title+" "+(it.takeaway||"")+" "+(it.source||"")).toLowerCase().includes(q)); }
+  document.getElementById("empty").style.display = items.length? "none":"block";
+  items.forEach((it,i)=>{
+    const col=colorFor(it.category, cats.findIndex(c=>c.id===it.category));
+    const card=document.createElement("div"); card.className="card";
+    const pts=(it.points||[]).map(p=>`<li>${esc(p)}</li>`).join("");
+    card.innerHTML=`
+      <div class="badges">
+        <span class="badge" style="background:${col}22;color:${col}">${esc(it.category_name)}</span>
+        <span class="src">${esc(it.source||"")}</span>
+        <span class="score">质量 ${it.score??""}</span>
+      </div>
+      <h2><a href="${esc(it.link)}" target="_blank" rel="noopener">${esc(it.title)}</a></h2>
+      ${pts?`<ul class="pts">${pts}</ul>`:(it.summary?`<div class="src" style="margin-top:4px">${esc(it.summary)}</div>`:"")}
+      ${it.takeaway?`<div class="take">💡 为什么关注：${esc(it.takeaway)}</div>`:""}
+    `;
+    list.appendChild(card);
+  });
+}
+
+function renderToggles(){
+  const box=document.getElementById("toggles"); box.innerHTML="";
+  (DATA?.categories||[]).forEach(c=>{
+    const row=document.createElement("div"); row.className="toggle-row";
+    row.innerHTML=`<div class="name">${esc(c.name)}</div>`;
+    const sw=document.createElement("div"); sw.className="sw"+(!hidden[c.id]?" on":"");
+    sw.onclick=()=>{ hidden[c.id]=!hidden[c.id]; saveHidden(); sw.className="sw"+(!hidden[c.id]?" on":""); render(); };
+    row.appendChild(sw); box.appendChild(row);
+  });
+}
+
+async function boot(){
+  if(DIGEST){ DATA=DIGEST; render(); renderToggles(); }
+  else {
+    try{
+      const r=await fetch("../data/latest.json",{cache:"no-store"});
+      if(r.ok){ DATA=await r.json(); render(); renderToggles(); return; }
+    }catch(e){}
+    document.getElementById("meta").textContent="无数据";
+    document.getElementById("empty").style.display="block";
+  }
+}
+
+document.getElementById("search").addEventListener("input",e=>{query=e.target.value;render();});
+document.getElementById("refreshBtn").onclick=()=>location.reload();
+document.getElementById("settingsBtn").onclick=()=>{
+  document.getElementById("mask").style.display="block";
+  document.getElementById("drawer").style.display="block";
+};
+document.getElementById("mask").onclick=()=>{
+  document.getElementById("mask").style.display="none";
+  document.getElementById("drawer").style.display="none";
+};
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+# NewsPulse 每日定时任务（无服务器、稳定、自动部署网页）
+#
+# 默认：UTC 00:00 = 北京时间 08:00。改时间请同步修改下面的 cron。
+#   UTC 表达式：分 时 日 月 周
+#   例：北京时间 07:30 => UTC 23:30 前一天 => "30 23 * * *"
+#   例：北京时间 21:00 => UTC 13:00        => "0 13 * * *"
+#
+# 启用：把本仓库推到 GitHub 即可。首次运行后 GitHub 会自动开启 Pages（源=GitHub Actions）。
+# 手机访问：https://<用户名>.github.io/<仓库名>/latest.html
+# 可选 Secrets：OPENROUTER_API_KEY（AI 摘要）、NTFY_TOPIC / TELEGRAM_* / WEBHOOK_URL（推送）
+# 也可在 Actions 页面点 "Run workflow" 手动触发一次。
+
+name: NewsPulse Daily
+
+on:
+  push:
+    branches: [main]            # 首次推送即自动跑一次（验证），日常靠下面 cron
+  schedule:
+    - cron: "0 0 * * *"          # 北京时间 08:00
+  workflow_dispatch: {}
+
+permissions:
+  contents: write        # 回写 history/ 保证跨日去重
+  pages: write           # 部署 Pages
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run aggregator
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          OPENROUTER_MODEL: ${{ secrets.OPENROUTER_MODEL }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+          PAGE_URL: ${{ secrets.PAGE_URL }}
+        run: python run.py --once
+
+      - name: Persist seen-history (cross-day dedup)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/history/ || true
+          git diff --cached --quiet || git commit -m "chore: update seen history $(date +%F)"
+          git push
+
+      - name: Add index.html redirect
+        run: cp data/latest.html data/index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: data
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,97 @@
+# ============================================================
+# NewsPulse 配置文件
+# 改这里即可调整：推送时间、内容偏好、领域与来源
+# ============================================================
+
+# —— 推送与定时（稳定调度：GitHub Actions 或本地 APScheduler）——
+schedule:
+  timezone: "Asia/Shanghai"   # 时区，决定推送时刻
+  hour: 8                      # 每天推送小时（0-23）
+  minute: 0                    # 分钟（0-59）
+
+# —— 内容偏好（多领域 + 深度 + 个性化）——
+preferences:
+  max_total: 36             # 每日最终条目上限
+  per_category: 7           # 单个领域最多条数
+  min_categories: 5         # 至少覆盖的领域数（保证多样性，避免单一浅薄）
+  translate_to_zh: false    # 是否将外文标题/摘要翻译为中文（需 AI key）
+  keywords_boost:           # 你关心的关键词，命中加权（提升相关性）
+    - AI
+    - 芯片
+    - 气候
+    - 经济
+  keywords_block:           # 你不想看到的词，命中则降权/剔除
+    - 明星八卦
+    - 广告
+
+# —— 推送渠道（全部可选；都留空 => 仅生成移动端网页）——
+notify:
+  ntfy_topic: ""           # 例：newspulse-你的随机串；手机 ntfy App 订阅
+  telegram_token: ""
+  telegram_chat_id: ""
+  webhook_url: ""           # 自定义 Webhook（企业微信/飞书/IFTTT 等）
+
+# —— 领域与来源（路由式注册，新增源只加条目）——
+# authority: 来源权威度权重(0-1)；weight: 该源条目相对权重
+categories:
+  - id: tech_ai
+    name: "科技与 AI"
+    enabled: true
+    authority: 1.0
+    sources:
+      - {name: "Hacker News",        url: "https://hnrss.org/frontpage",                     weight: 1.0}
+      - {name: "The Verge",          url: "https://www.theverge.com/rss/index.xml",         weight: 0.9}
+      - {name: "MIT Tech Review",    url: "https://www.technologyreview.com/feed/",         weight: 1.0}
+      - {name: "Ars Technica",       url: "http://feeds.arstechnica.com/arstechnica/index", weight: 0.9}
+      - {name: "少数派",              url: "https://sspai.com/feed",                         weight: 0.8}
+      - {name: "机器之心",            url: "https://www.jiqizhixin.com/rss",                 weight: 0.9}
+
+  - id: finance
+    name: "财经与商业"
+    enabled: true
+    authority: 0.95
+    sources:
+      - {name: "The Economist (Markets)", url: "https://www.economist.com/finance-and-economics/rss.xml", weight: 1.0}
+      - {name: "NPR Business",            url: "https://feeds.npr.org/1032/rss.xml",                       weight: 0.8}
+      - {name: "BBC Business",            url: "https://feeds.bbci.co.uk/news/business/rss.xml",           weight: 0.9}
+      - {name: "Fortune",                 url: "https://fortune.com/feed",                                weight: 0.8}
+
+  - id: world
+    name: "国际与地缘"
+    enabled: true
+    authority: 0.95
+    sources:
+      - {name: "BBC World",      url: "https://feeds.bbci.co.uk/news/world/rss.xml",  weight: 0.9}
+      - {name: "The Guardian",   url: "https://www.theguardian.com/world/rss",       weight: 1.0}
+      - {name: "NPR News",       url: "https://feeds.npr.org/1001/rss.xml",          weight: 0.8}
+      - {name: "Al Jazeera",     url: "https://www.aljazeera.com/xml/rss/all.xml",   weight: 0.9}
+      - {name: "DW English",     url: "https://rss.dw.com/rdf/rss-en-all",           weight: 0.8}
+
+  - id: science
+    name: "科学与自然"
+    enabled: true
+    authority: 1.0
+    sources:
+      - {name: "Nature",              url: "https://www.nature.com/nature.rss",              weight: 1.0}
+      - {name: "Science Daily",       url: "https://www.sciencedaily.com/rss/all.xml",       weight: 0.9}
+      - {name: "Scientific American", url: "https://www.scientificamerican.com/feed/",       weight: 0.9}
+      - {name: "Quanta",              url: "https://www.quantamagazine.org/feed/",           weight: 1.0}
+
+  - id: culture
+    name: "文化与思想"
+    enabled: true
+    authority: 0.9
+    sources:
+      - {name: "The Atlantic", url: "https://www.theatlantic.com/feed/all/", weight: 1.0}
+      - {name: "Aeon",         url: "https://aeon.co/feed",                   weight: 0.9}
+      - {name: "NYR Books",    url: "https://www.nybooks.com/feed/",          weight: 0.9}
+      - {name: "NPR Arts",     url: "https://feeds.npr.org/1039/rss.xml",     weight: 0.7}
+
+  - id: society
+    name: "社会与深度"
+    enabled: true
+    authority: 0.9
+    sources:
+      - {name: "ProPublica",       url: "https://www.propublica.org/feeds/propublica/main", weight: 1.0}
+      - {name: "The Conversation", url: "https://theconversation.com/us/articles.atom",     weight: 0.9}
+      - {name: "BBC",             url: "https://feeds.bbci.co.uk/news/rss.xml",             weight: 0.8}
