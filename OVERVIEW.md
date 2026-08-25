@@ -14,7 +14,7 @@
 - **移动端**：`frontend/index.html` 单文件、内联 CSS/JS/SVG、零外链、可加到主屏；底部分类胶囊导航 + 日期回看。
 - **底部导航（全部+分类） + 回看往日**：底部为横向滚动胶囊导航——「全部」+ 6 个具体分类区块（带配色圆点，拇指可达）；顶部日期药丸唤起日期选择器，可加载 `data/archive/<日期>.json` 回看任意一天。生成器每日归档并随 GitHub Pages 的 `data/` 目录发布。
 - **列表 → 详情阅读**：列表页展示精简摘要（summary 截断 400 字），点击卡片进入详情页展示**完整原文内容**（`content` 字段不截断）+ 要点速览 + AI 点评 + 「阅读原文」外链。数据传递：每条新闻由生成器写入稳定唯一 `id`（来源+标题 MD5 前 12 位），列表卡片仅携带 `data-id`，详情视图按 id 从当前数据源（内联 today / archive JSON）查找完整对象——不把完整数据塞进 DOM/URL，防注入、无冗余。hash 路由 `#/item/<id>` 支持前进/后退/刷新恢复；id 不存在、archive 404、fetch 失败均有空态提示。
-- **底部导航展开/收起**：收起态显示「全部 + 前 3 分类 + 更多」，点击「更多」平滑展开为全部分类网格（箭头旋转动画 + 位移/透明度过渡），再次点击/点遮罩/选中分类后收起；响应式：移动端贴底适配安全区，桌面端（≥860px）居中浮条且默认展示全部分类。
+- **底部导航（Modal Bottom Sheet）**：底栏为单胶囊切换器（当前分类 + chevron），点击展开**标准底部抽屉**（圆角顶部 18px + grab handle + 阴影 + 遮罩 + 滑入动画 translateY 100%→0），抽屉内为标题 + 2 列 cat-grid（全部 + 6 分类，含配色点/名称/数量/选中态）。借鉴 GitHub 上 react-native-bottom-action-sheet、Material BottomSheetDialogFragment、Flutter showModalBottomSheet 等开源项目共识——移动端"更多"展开的标准模式。响应式：移动端贴底上滑；桌面端（≥860px）抽屉居中浮起（圆角四周），底栏收束为居中浮条。
 - **可配置**：`config.yaml` 调推送时间、领域开关、每领域条数、关键词加权/屏蔽、外文翻译。
 - **稳定定时**：GitHub Actions cron（推荐，免费）+ 本地 APScheduler（`--serve`）二选一。
 - **多渠道推送**：ntfy / Telegram / 自定义 Webhook，全部可选、失败不中断。
