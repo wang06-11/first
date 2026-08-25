@@ -35,14 +35,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 跨日去重历史用 Actions Cache 持久化，避免在 runner 里 git push 冲突
-      - name: Restore seen-history cache
+      # 跨日去重历史用 Actions Cache 持久化，避免在 runner 里 git push 冲突。
+      # 注意：历史只记录「已推送」条目（pushed.json），而非全部抓取条目，
+      # 否则更新慢的分类次日会被整体误判为已见、标签没有内容。
+      - name: Restore pushed-history cache
         uses: actions/cache@v4
         with:
-          path: data/history/seen.json
-          key: newspulse-seen-${{ github.run_id }}
+          path: data/history/pushed.json
+          key: newspulse-pushed-${{ github.run_id }}
           restore-keys: |
-            newspulse-seen-
+            newspulse-pushed-
 
       - name: Set up Python
         uses: actions/setup-python@v5

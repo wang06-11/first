@@ -68,6 +68,9 @@ def run_once(cfg: NewsPulseConfig, page_url: str = "") -> dict:
             it, it["_cat_authority"], it["_source_weight"], cfg.preferences
         )
     selected = scorer.select(items, cfg.preferences)
+    # 只把「最终精选推送」的条目记入跨日去重历史（防明天重复推），
+    # 而非抓取过的全部条目——否则更新慢的分类次日会被整体掏空。
+    dedup.remember_pushed(selected)
 
     ai_key = cfg.openrouter_key
     model = cfg.openrouter_model
