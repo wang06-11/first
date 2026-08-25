@@ -51,15 +51,6 @@
   }
   .iconbtn:active{background:var(--primary-soft)}
 
-  /* 搜索条（仅在“搜索”标签激活时展开） */
-  .searchbar{display:none;padding:0 0 var(--s2);overflow:hidden}
-  .searchbar.show{display:block;animation:drop .22s cubic-bezier(.2,.7,.2,1)}
-  .search{
-    width:100%;height:44px;border:1px solid var(--line);border-radius:12px;
-    padding:0 14px;font-size:16px;background:var(--card);color:var(--ink);outline:none;
-  }
-  .search:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
-
   /* —— 列表 —— */
   .list{margin:var(--s4) 0 var(--s2)}
   .dayhead{display:flex;align-items:baseline;gap:var(--s2);margin:var(--s4) 2px var(--s2)}
@@ -91,23 +82,26 @@
   .empty code{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13px}
   footer{text-align:center;color:var(--sub-2);font-size:12px;padding:var(--s4) 0 calc(var(--s4) + 4px)}
 
-  /* —— 底部导航 —— */
+  /* —— 底部导航（全部 + 具体分类，横向滚动胶囊） —— */
   nav.tabbar{
     position:fixed;left:0;right:0;bottom:0;z-index:30;
     background:rgba(255,255,255,.94);backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px);
     border-top:1px solid var(--line);
-    padding-bottom:var(--safe);
-    display:flex;
+    padding:8px 12px calc(8px + var(--safe));
+    display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;
   }
+  nav.tabbar::-webkit-scrollbar{display:none}
   .tab{
-    flex:1;min-width:0;background:none;border:none;cursor:pointer;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-    height:56px;color:var(--sub);padding:6px 2px 0;
+    flex:none;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:999px;
+    cursor:pointer;display:flex;align-items:center;gap:6px;height:40px;padding:0 14px;color:var(--sub);
+    font-size:14px;font-weight:600;white-space:nowrap;
+    transition:background .15s,color .15s,border-color .15s;
   }
-  .tab svg{width:23px;height:23px}
-  .tab .lab{font-size:11px;font-weight:600;line-height:1}
-  .tab.on{color:var(--primary)}
-  .tab.on svg{stroke-width:2.2}
+  .tab svg{width:17px;height:17px;flex:none}
+  .tab .dotc{width:8px;height:8px;border-radius:50%;flex:none}
+  .tab .lab{line-height:1}
+  .tab.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .tab.on .dotc{box-shadow:0 0 0 2px rgba(255,255,255,.55)}
   .tab:active{background:var(--primary-soft)}
 
   /* —— 底部抽屉（日期 / 领域） —— */
@@ -137,32 +131,7 @@
     color:#fff;font-size:15.5px;font-weight:700;cursor:pointer;
   }
   .primary-btn:active{filter:brightness(.95)}
-  /* 领域列表 */
-  .catrow{
-    display:flex;align-items:center;gap:var(--s3);padding:14px 4px;border-bottom:1px solid var(--line);cursor:pointer;
-  }
-  .catrow:last-child{border-bottom:none}
-  .catrow .dotc{width:10px;height:10px;border-radius:50%;flex:none}
-  .catrow .nm{font-size:15.5px;font-weight:600;flex:1}
-  .catrow .cnt{font-size:13px;color:var(--sub);font-variant-numeric:tabular-nums}
-  .catrow .tick{width:20px;height:20px;color:var(--primary);opacity:0;flex:none}
-  .catrow.on .tick{opacity:1}
-  .catrow.on .nm{color:var(--primary)}
 
-  /* 设置抽屉 */
-  .drawer-mask{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:40;display:none}
-  .drawer{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);
-    border-radius:18px 18px 0 0;padding:var(--s4) var(--s4) calc(var(--s5) + var(--safe));display:none;max-height:80vh;overflow:auto}
-  .drawer h3{margin:0 0 var(--s3);font-size:17px}
-  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 2px;border-bottom:1px solid var(--line)}
-  .toggle-row .name{font-size:15px}
-  .sw{width:48px;height:28px;border-radius:999px;background:var(--line);position:relative;transition:.2s;flex:none}
-  .sw.on{background:var(--primary)}
-  .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
-  .sw.on::after{left:23px}
-  .drawer .hint{color:var(--sub);font-size:13px;margin-top:var(--s3);line-height:1.6}
-
-  @keyframes drop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   /* 桌面端：底部导航收束为居中浮条，内容更宽留白 */
   @media (min-width:860px){
@@ -187,9 +156,6 @@
       </button>
     </div>
   </div>
-  <div class="wrap searchbar" id="searchbar">
-    <input class="search" id="search" type="search" placeholder="搜索标题 / 关键词 / 来源" />
-  </div>
 </header>
 
 <main class="wrap">
@@ -202,25 +168,8 @@
 
 <footer>NewsPulse · 多领域 · 有深度 · 每日 08:00 推送</footer>
 
-<!-- 底部导航 -->
-<nav class="tabbar" id="tabbar">
-  <button class="tab on" data-tab="all">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
-    <span class="lab">全部</span>
-  </button>
-  <button class="tab" data-tab="cat">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5 12 3l8.5 4.5L12 12 3.5 7.5Z"/><path d="M3.5 7.5V16l8.5 4.5V12M20.5 7.5V16L12 20.5"/><path d="m12 3 8.5 4.5"/></svg>
-    <span class="lab">领域</span>
-  </button>
-  <button class="tab" data-tab="search">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
-    <span class="lab">搜索</span>
-  </button>
-  <button class="tab" data-tab="settings">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.05.05a2 2 0 1 1-2.83 2.83l-.05-.05a1.7 1.7 0 0 0-2.87 1.2V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-2.87-1.2l-.05.05a2 2 0 1 1-2.83-2.83l.05-.05a1.7 1.7 0 0 0-1.2-2.87H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.2-2.87l-.05-.05A2 2 0 1 1 6.2 3.6l.05.05a1.7 1.7 0 0 0 1.87.34H8a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 2.87 1.2l.05-.05a2 2 0 1 1 2.83 2.83l-.05.05a1.7 1.7 0 0 0-.34 1.87Z"/></svg>
-    <span class="lab">设置</span>
-  </button>
-</nav>
+<!-- 底部导航：全部 + 具体分类区块（由 JS 动态生成） -->
+<nav class="tabbar" id="tabbar"></nav>
 
 <!-- 日期选择抽屉 -->
 <div class="sheet-mask" id="dateMask"></div>
@@ -236,26 +185,8 @@
   <button class="primary-btn" id="dateGo">查看这一天</button>
 </div>
 
-<!-- 领域筛选抽屉 -->
-<div class="sheet-mask" id="catMask"></div>
-<div class="sheet" id="catSheet">
-  <div class="grab"></div>
-  <h3>按领域筛选</h3>
-  <p class="sub">选择一个领域只看该类资讯</p>
-  <div id="catList"></div>
-</div>
-
-<!-- 设置抽屉 -->
-<div class="drawer-mask" id="mask"></div>
-<div class="drawer" id="drawer">
-  <h3>显示设置（仅本机偏好）</h3>
-  <div id="toggles"></div>
-  <div class="hint">把本页「添加到主屏幕」即可像 App 一样在手机打开。<br/>
-  推送时间与内容领域请在项目 <code>config.yaml</code> 中配置后重新生成。</div>
-</div>
-
 <script>
-const DIGEST = {"date": "2026-08-25", "generated_at": "2026-08-25T08:59:38.742109+00:00", "total": 30, "categories": [{"id": "science", "name": "科学与健康", "count": 5}, {"id": "tech_ai", "name": "科技与 AI", "count": 5}, {"id": "finance", "name": "财经与商业", "count": 5}, {"id": "society", "name": "社会与深度", "count": 5}, {"id": "world", "name": "时事与国际", "count": 5}, {"id": "culture", "name": "文化与思想", "count": 5}], "items": [{"title": "第一批染腋毛的年轻人，全靠“不想忍了”", "summary": "染腋毛，成了女孩们和腋毛相处的新方式。 撰文：娃娃菜 编辑：木也 封面来源：受访者提供 一把刷子、一盒50元的漂膏。小葵站在卫生间里，身上只穿着内衣，一只手高举过头顶，另一只手有些费力地把漂膏刷在腋下。刺痛感像细针一样扎进来，她咬牙保持着这个姿势，胳膊因为举了太久有些酸得发抖。 她要把自己的腋毛染成金色。 因为腋毛又硬又卷，还只能单手操作，要保证每一根毛都均匀地裹上了漂膏并非易事；涂完还要一直举着双手等待掉色，什么事都做不了。原地罚站半个小时后，即使事前涂了身体乳做保护， 小葵腋下的皮肤还是被漂膏刺激得通红，但腋毛的颜色却一根没变。 不死心的小葵又用眉毛漂膏重新涂一遍，再熬一轮，前后折腾两个多小时，她终于得到了金色的腋毛。 选金色的原因不是因为喜欢，这已经是相对省事的颜色，只漂一道，不用二次上色。 想要获得蓝色腋毛，则需要先漂再上色丨 要问小葵对染腋毛的最大感受，那就是远比想象中麻烦。但即", "points": ["染腋毛，成了女孩们和腋毛相处的新方式。 撰文：娃娃菜 编辑：木也 封面来源：受访者提供 一把刷子、一盒50元的漂膏。小葵站在卫生间里，身上只穿着内衣，一只手高举过头顶，另一只手有些费力地把漂膏刷在腋下。刺痛感像细针一样扎进来，她咬牙保持着这个姿势，胳膊因为举了太久有些酸得发抖。 她要把自己的腋毛染成金色。 因为腋毛又硬又卷，还只能单手操作，要保证每一根毛都均匀地裹上了漂膏并非易事；涂完还要一直举着双手等待掉色，什么事都做不了。原地罚站半个小时后，即使事前涂了身体乳做保护， 小…"], "takeaway": "", "link": "https://www.guokr.com/article/470024/", "source": "果壳科学人", "category": "science", "category_name": "科学与健康", "score": 94.2, "published": "2026-08-25T08:15:07+00:00", "ai": false}, {"title": "美国计划再次对 H1B 签证征收 10 万美元费用，计划吊销 20 万商务或旅游签证", "summary": "美国总统特朗普于 2025 年 9 月签署总统令，规定申请 H1B 签证需缴纳 10 万美元手续费。但联邦地区法院今年 6 月判定这一措施违法并予以撤销。本周一特朗普政府公布了新草案，计划再次对 H1B 签证收取 10 万 3265 美元手续费。国土安全部表示，虽然新规草案规定的金额与总统令相近，但两者并非同一措施，法律依据也不同。根据新规草案，这笔附加手续费将在现行数千美元手续费的基础上另行收取，目的是用于“各政府部门合法移民系统的运营费用”，包括移民局系统现代化以及检测违规行为等。与此同时，特朗普政府还计划吊销多达 20 万名外国人的商务或旅游签证（B1 和 B2 签证）。如果这一计划得以实施，这将是美国历史上规模最大的单次签证吊销行动。", "points": ["美国总统特朗普于 2025 年 9 月签署总统令，规定申请 H1B 签证需缴纳 10 万美元手续费。但联邦地区法院今年 6 月判定这一措施违法并予以撤销。本周一特朗普政府公布了新草案，计划再次对 H1B 签证收取 10 万 3265 美元手续费。国土安全部表示，虽然新规草案规定的金额与总统令相近，但两者并非同一措施，法律依据也不同。根据新规草案，这笔附加手续费将在现行数千美元手续费的基础上另行收取，目的是用于“各政府部门合法移民系统的运营费用”，包括移民局系统现代化以及检测违…"], "takeaway": "", "link": "https://www.solidot.org/story?sid=85188", "source": "Solidot", "category": "tech_ai", "category_name": "科技与 AI", "score": 94.0, "published": "2026-08-25T07:23:25+00:00", "ai": false}, {"title": "OpenAI高管预判：Codex与ChatGPT终将“消失”，未来将只留一个“个人AGI”", "summary": "OpenAI正在推动一场深层次的产品整合——不只是把两款应用合二为一，而是要让\"ChatGPT\"与\"Codex\"这两个概念本身彻底消失，最终收敛为一个长期理解用户、自主完成任务的个人通用智能（Personal AGI）。 OpenAI Codex负责人Tibo Sottiaux近日接受科技博主Matthew Berman专访时明确表示，Codex已深度并入ChatGPT产品体系，原本面向开发者的编程能力正逐步向全体用户开放。但他强调，这只是第一步。 Tibo 描绘的终局极为震撼：未来，所有复杂的底层架构都将被彻底隐藏。最终只剩下一个极其极简、深度理解你、并能瞬间调动海量云端算力的“个人通用智能”（Personal AGI）。 访谈中，Tibo还披露了一系列具有市场参考价值的数据与判断：Codex用户量已达约2000万；OpenAI普通推理速度在过去三个月提升约60%；Ultra Fast极", "points": ["OpenAI正在推动一场深层次的产品整合——不只是把两款应用合二为一，而是要让\"ChatGPT\"与\"Codex\"这两个概念本身彻底消失，最终收敛为一个长期理解用户、自主完成任务的个人通用智能（Personal AGI）。 OpenAI Codex负责人Tibo Sottiaux近日接受科技博主Matthew Berman专访时明确表示，Codex已深度并入ChatGPT产品体系，原本面向开发者的编程能力正逐步向全体用户开放。但他强调，这只是第一步。 Tibo 描绘的终局极为震…"], "takeaway": "", "link": "https://wallstreetcn.com/articles/3780238", "source": "华尔街见闻", "category": "finance", "category_name": "财经与商业", "score": 93.7, "published": "2026-08-25T08:04:55+00:00", "ai": false}, {"title": "老铺黄金：上半年集团销售业绩约为人民币227.79亿元，同比增长约60.6%。本集团营业收入为约人民币198.08亿元，同比增长约60.3%。于报告期间，本集团毛利额为约人...", "summary": "老铺黄金：上半年集团销售业绩约为人民币227.79亿元，同比增长约60.6%。本集团营业收入为约人民币198.08亿元，同比增长约60.3%。于报告期间，本集团毛利额为约人民币81.74亿元，同比增长约73.7%。 风险提示及免责条款 市场有风险，投资需谨慎。本文不构成个人投资建议，也未考虑到个别用户特殊的投资目标、财务状况或需要。用户应考虑本文中的任何意见、观点或结论是否符合其特定状况。据此投资，责任自负。", "points": ["老铺黄金：上半年集团销售业绩约为人民币227.79亿元，同比增长约60.6%。本集团营业收入为约人民币198.08亿元，同比增长约60.3%。于报告期间，本集团毛利额为约人民币81.74亿元，同比增长约73.7%。 风险提示及免责条款 市场有风险，投资需谨慎。本文不构成个人投资建议，也未考虑到个别用户特殊的投资目标、财务状况或需要。用户应考虑本文中的任何意见、观点或结论是否符合其特定状况。据此投资，责任自负。"], "takeaway": "", "link": "https://wallstreetcn.com/articles/3780244", "source": "华尔街见闻", "category": "finance", "category_name": "财经与商业", "score": 93.7, "published": "2026-08-25T08:33:15+00:00", "ai": false}, {"title": "突破具身智能物理死角：IJCAI 2026 具身智能泛化与控制突破", "summary": "告别理想仿真，中国学术团队用物理工程方案回应落地挑战。 &nbsp; &nbsp; 作者丨 张璐 &nbsp; &nbsp; 编辑丨 岑峰 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &", "points": ["告别理想仿真，中国学术团队用物理工程方案回应落地挑战。 &nbsp; &nbsp; 作者丨 张璐 &nbsp; &nbsp; 编辑丨 岑峰 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &n…"], "takeaway": "", "link": "https://www.leiphone.com/category/private/5YB9zkA19rHTGz0o.html", "source": "雷锋网", "category": "tech_ai", "category_name": "科技与 AI", "score": 93.7, "published": "2026-08-25T06:42:00+00:00", "ai": false}, {"title": "阿里云 Token Plan 接入千问 App 及 PC 端，支持 Qwen3.8-Max 等模型", "summary": "IT之家 8 月 25 日消息，阿里云今日宣布， 阿里云 Token Plan 正式接入千问 App 及 PC 端 。用户只需将 API Key 绑定至千问，即可直接调用 Token Plan 订阅额度， 支持 Qwen3.8-Max 等模型 。 IT之家获悉，千问 App 用户可在工作助理中添加 Token Plan 的 API Key 完成绑定。使用工作助理执行复杂任务时，例如操作电脑和浏览器、调用 skill 来交付 office 文档、应用和网站等，都可直接使用 Token Plan 订阅额度。 据介绍，阿里云 Token Plan 支持在 Qoder、Codex 等 AI 工具中使用统一 API Key、按需自主切换模型，获得更稳定、灵活的模型服务。 千问工作助理可围绕用户目标自主拆解任务、调用工具，并连接邮件、日历、网盘、浏览器等应用，处理 Word、Excel、PPT 等常见", "points": ["IT之家 8 月 25 日消息，阿里云今日宣布， 阿里云 Token Plan 正式接入千问 App 及 PC 端 。用户只需将 API Key 绑定至千问，即可直接调用 Token Plan 订阅额度， 支持 Qwen3.8-Max 等模型 。 IT之家获悉，千问 App 用户可在工作助理中添加 Token Plan 的 API Key 完成绑定。使用工作助理执行复杂任务时，例如操作电脑和浏览器、调用 skill 来交付 office 文档、应用和网站等，都可直接使用 To…"], "takeaway": "", "link": "https://www.ithome.com/0/994/095.htm", "source": "IT之家", "category": "tech_ai", "category_name": "科技与 AI", "score": 93.6, "published": "2026-08-25T08:57:41+00:00", "ai": false}, {"title": "vivo X500 Pro Max 手机现身 Geekbench，天玑 9600 Pro 芯片", "summary": "IT之家 8 月 25 日消息，一款型号为 V2610 的 vivo 新机近日出现在 Geekbench 跑分数据库，科技媒体 GSMArena 认为该机是 vivo X500 Pro Max。 从数据库信息来看， 这款手机搭载联发科 MT6995 芯片 ，拥有 8 个核心，主频最高 4.55GHz，配备 12GB 内存，运行 Android 17 操作系统。 同时， 该机在 Geekbench 6 测试中录得单核 2574 分 、 多核 7756 分的成绩 。 据微博博主 @数码闲聊站 此前爆料，vivo X500 Pro Max 预计将配备联发科天玑 9600 Pro 芯片。该机的「蓝图光御 900」为 50MP 1/1.28\" 主摄。此外，该机还搭载 X300 Ultra 超大杯同款的 2 亿灭霸长焦，200MP HP0 定制大底潜望。 IT之家注意到，vivo X500 系列手机将", "points": ["IT之家 8 月 25 日消息，一款型号为 V2610 的 vivo 新机近日出现在 Geekbench 跑分数据库，科技媒体 GSMArena 认为该机是 vivo X500 Pro Max。 从数据库信息来看， 这款手机搭载联发科 MT6995 芯片 ，拥有 8 个核心，主频最高 4.55GHz，配备 12GB 内存，运行 Android 17 操作系统。 同时， 该机在 Geekbench 6 测试中录得单核 2574 分 、 多核 7756 分的成绩 。 据微博博主…"], "takeaway": "", "link": "https://www.ithome.com/0/994/094.htm", "source": "IT之家", "category": "tech_ai", "category_name": "科技与 AI", "score": 93.6, "published": "2026-08-25T08:55:58+00:00", "ai": false}, {"title": "Firefox 和 Chrome 准备启用对 JPEG XL 的支持", "summary": "Firefox 和 Chrome 都宣布准备启用对 JPEG XL 的支持。JPEG XL 是一种免版税的位图文件格式，支持有损和无损压缩。它旨在超越现有的位图格式，并成为它们的通用替代。Google Chrome 在 2023 年 移除了对实验性的 JPEG-XL 图像格式的支持，引发了很多争议，因为 Chrome/Chromium 占据了九成市场份额，它是 Web 标准事实上的仲裁者。但到了 2025 年 Google 改变了主意，Chrome/Chromium 加入了 Rust 语言开发的 JPEG-XL 图像解码器 jxl-rs，但对 JPEG-XL 的支持还没有默认启用。Mozilla 开发者通过邮件列表宣布即将释出的 Firefox 157 将默认启用对 JPEG XL 的支持。Google 也宣布准备默认启用。苹果的 Safari 则早在 2023 年就加入了对 JPEG-X", "points": ["Firefox 和 Chrome 都宣布准备启用对 JPEG XL 的支持。JPEG XL 是一种免版税的位图文件格式，支持有损和无损压缩。它旨在超越现有的位图格式，并成为它们的通用替代。Google Chrome 在 2023 年 移除了对实验性的 JPEG-XL 图像格式的支持，引发了很多争议，因为 Chrome/Chromium 占据了九成市场份额，它是 Web 标准事实上的仲裁者。但到了 2025 年 Google 改变了主意，Chrome/Chromium 加入了…"], "takeaway": "", "link": "https://www.solidot.org/story?sid=85187", "source": "Solidot", "category": "tech_ai", "category_name": "科技与 AI", "score": 93.6, "published": "2026-08-25T06:45:01+00:00", "ai": false}, {"title": "北部湾一海底天然气管线环评获批 环境部要求施工期间保护布氏鲸", "summary": "布氏鲸是国家一级重点保护野生动物，北海涠洲岛海域的布氏鲸是中国大陆唯一近岸分布的大型鲸类生活群体 【财新网】 生态环境部近日批复《涠洲12—1 PUQ到涠洲终端天然气管线项目环境影响报告书》（下称“环评报告书”），原则同意环评报告书的总体结论和拟采取的生态环境保护措施。环境部在上述批复中要求，项目合理安排施工时间，定向钻及海底管道挖沟施工应避开布氏鲸主要活动期（1月至4月）。施工期加强瞭望，发现布氏鲸、中华白海豚等珍贵、濒危海洋动物，应立即停止施工，待其游离后方可施工。若发现布氏鲸、中华白海豚等受伤，应及时采取紧急救护措施并报告相关部门处理。", "points": ["布氏鲸是国家一级重点保护野生动物，北海涠洲岛海域的布氏鲸是中国大陆唯一近岸分布的大型鲸类生活群体 【财新网】 生态环境部近日批复《涠洲12—1 PUQ到涠洲终端天然气管线项目环境影响报告书》（下称“环评报告书”），原则同意环评报告书的总体结论和拟采取的生态环境保护措施。环境部在上述批复中要求，项目合理安排施工时间，定向钻及海底管道挖沟施工应避开布氏鲸主要活动期（1月至4月）。施工期加强瞭望，发现布氏鲸、中华白海豚等珍贵、濒危海洋动物，应立即停止施工，待其游离后方可施工。若发现…"], "takeaway": "", "link": "https://science.caixin.com/2026-08-25/102477776.html", "source": "财新网", "category": "finance", "category_name": "财经与商业", "score": 93.3, "published": "2026-08-25T07:56:32+00:00", "ai": false}, {"title": "十四届全国人大常委会第二十四次会议在京举行", "summary": "十四届全国人大常委会第二十四次会议25日上午在北京人民大会堂举行第一次全体会议。赵乐际委员长主持。 常委会组成人员149人出席会议，出席人数符合法定人数。 会议听取了全国人大宪法和法律委员会副主任委员丛斌作的关于医疗保障法草案审议结果的报告。草案三审稿在立法目的中增加“落实健康优先发展战略”，进一步完善医疗保障体系有关规定，充实医疗保障基金使用、管理有关规定，细化异地就医医药费用结算要求，增加长期护理保险相关规定，完善有关法律责任规定等。 会议听取了宪法和法律委员会主任委员信春鹰作的关于耕地保护和质量提升法草案审议结果的报告。草案三审稿增加鼓励高等学校、科研院所等加强耕地保护和质量提升方面人才培养的规定；明确河湖管理范围内的土地原则上不作为补充耕地来源；强化对高标准农田建设资金的监督管理；增加对沙化、风蚀、水蚀耕地开展综合治理，预防和治理水土流失的规定；加大对黑土地的保护力度等。 会议听取", "points": ["十四届全国人大常委会第二十四次会议25日上午在北京人民大会堂举行第一次全体会议。赵乐际委员长主持。 常委会组成人员149人出席会议，出席人数符合法定人数。 会议听取了全国人大宪法和法律委员会副主任委员丛斌作的关于医疗保障法草案审议结果的报告。草案三审稿在立法目的中增加“落实健康优先发展战略”，进一步完善医疗保障体系有关规定，充实医疗保障基金使用、管理有关规定，细化异地就医医药费用结算要求，增加长期护理保险相关规定，完善有关法律责任规定等。 会议听取了宪法和法律委员会主任委员信…"], "takeaway": "", "link": "https://m.thepaper.cn/detail/33846460", "source": "澎湃精选", "category": "society", "category_name": "社会与深度", "score": 93.3, "published": "2026-08-25T08:59:29+00:00", "ai": false}, {"title": "【社论】以修法回应道路交通安全新关切", "summary": "自动驾驶汽车的上道路条件是什么？“醉驾”“盲驾”“僵尸车”“超标车”如何治理？电动自行车的最高时速限制如何调整？“暴走团”如何管理……8月25日，道路交通安全法修订草案提请全国人大常委会初次审议，其中涉及颇多近年来备受社会关注的焦点问题。 今年6月，国务院常务会议讨论并原则通过《中华人民共和国道路交通安全法（修订草案）》，决定将草案提请全国人大常委会审议。会议指出，要进一步提升道路交通安全治理水平，积极稳妥应对新型安全风险，遏制各类交通事故，更好守护人民群众人身财产安全、助力高质量发展。 此次修订草案专门设置了“自动驾驶汽车的特别规定”一章，明确了自动驾驶汽车和辅助驾驶功能的概念。尤其是，针对在自动驾驶功能激活状态下发生道路交通安全违法行为的，明确由汽车生产企业、进口企业接受处理。 这不仅是规范自动驾驶，也是为产业发展廓清法律边界：当驾驶行为逐渐从“人操作车辆”转向“系统控制车辆”，传统意", "points": ["自动驾驶汽车的上道路条件是什么？“醉驾”“盲驾”“僵尸车”“超标车”如何治理？电动自行车的最高时速限制如何调整？“暴走团”如何管理……8月25日，道路交通安全法修订草案提请全国人大常委会初次审议，其中涉及颇多近年来备受社会关注的焦点问题。 今年6月，国务院常务会议讨论并原则通过《中华人民共和国道路交通安全法（修订草案）》，决定将草案提请全国人大常委会审议。会议指出，要进一步提升道路交通安全治理水平，积极稳妥应对新型安全风险，遏制各类交通事故，更好守护人民群众人身财产安全、助力…"], "takeaway": "", "link": "https://m.thepaper.cn/detail/33846190", "source": "澎湃精选", "category": "society", "category_name": "社会与深度", "score": 93.0, "published": "2026-08-25T08:48:17+00:00", "ai": false}, {"title": "抖音博主“山西铁头”涉嫌敲诈勒索被抓，警方公开征集该团伙犯罪线索", "summary": "8月25日，太原市公安局小店分局发布关于公开征集王某钢等人涉嫌恶意索赔、敲诈勒索等违法犯罪线索的通告： 近期，太原市公安局小店分局依法打掉一个以王某钢为首的涉嫌敲诈勒索犯罪团伙，抓获包括王某钢在内的犯罪嫌疑人13名。经查，王某钢系抖音账号“山西铁头”博主。 为全面查清该团伙的违法犯罪事实，希望受到该犯罪团伙不法侵害的受害人、知晓该犯罪团伙违法犯罪线索的人民群众积极提供线索和证据。公安机关将对举报人、检举人的信息严格保密，并依法保护举报人、检举人的合法权利。 举报方式： 1、来信、来访地址：太原市小店区昌盛东街太原市公安局小店分局刑事侦查大队 2、举报电话：0351-7569110", "points": ["8月25日，太原市公安局小店分局发布关于公开征集王某钢等人涉嫌恶意索赔、敲诈勒索等违法犯罪线索的通告： 近期，太原市公安局小店分局依法打掉一个以王某钢为首的涉嫌敲诈勒索犯罪团伙，抓获包括王某钢在内的犯罪嫌疑人13名。经查，王某钢系抖音账号“山西铁头”博主。 为全面查清该团伙的违法犯罪事实，希望受到该犯罪团伙不法侵害的受害人、知晓该犯罪团伙违法犯罪线索的人民群众积极提供线索和证据。公安机关将对举报人、检举人的信息严格保密，并依法保护举报人、检举人的合法权利。 举报方式： 1、来…"], "takeaway": "", "link": "https://m.thepaper.cn/detail/33846397", "source": "澎湃精选", "category": "society", "category_name": "社会与深度", "score": 93.0, "published": "2026-08-25T08:56:54+00:00", "ai": false}, {"title": "剑桥最年轻黑人教授涉学术诚信争议离世后 指控者遭停职调查", "summary": "阿尔戴的离世，导致围绕学术诚信、种族和DEI的争议又被推至舆论的风口浪尖，有关这场悲剧的责任归属的争论也迅速升温 【财新网】 2023年，在英国学界持续跃升的贾森·阿尔戴（Jason Arday），成为顶尖学府剑桥大学最年轻黑人教授。三年后，随着有关其学术诚信和个人经历存在不实陈述的争议持续发酵，2026年8月14日，阿尔戴被发现在伦敦南部巴特西的住所内身亡，年仅41岁。 但争议并未随着阿尔戴的离世而停止，相反舆论风暴愈演愈烈。8月20日，最初指控阿尔戴学术不端的剑桥大学前研究员、比利时根特大学哲学与道德科学系的博士后研究员内森·科夫纳斯（Nathan Cofnas）遭根特大学停职，为这场仍在发酵中的争议增添了新一轮燃料。", "points": ["阿尔戴的离世，导致围绕学术诚信、种族和DEI的争议又被推至舆论的风口浪尖，有关这场悲剧的责任归属的争论也迅速升温 【财新网】 2023年，在英国学界持续跃升的贾森·阿尔戴（Jason Arday），成为顶尖学府剑桥大学最年轻黑人教授。三年后，随着有关其学术诚信和个人经历存在不实陈述的争议持续发酵，2026年8月14日，阿尔戴被发现在伦敦南部巴特西的住所内身亡，年仅41岁。 但争议并未随着阿尔戴的离世而停止，相反舆论风暴愈演愈烈。8月20日，最初指控阿尔戴学术不端的剑桥大学前研…"], "takeaway": "", "link": "https://international.caixin.com/2026-08-25/102477750.html", "source": "财新网", "category": "finance", "category_name": "财经与商业", "score": 92.8, "published": "2026-08-25T07:06:07+00:00", "ai": false}, {"title": "为什么婚后2~3年，是离婚高峰？而不是“七年之痒”？", "summary": "本文转载自微信公众号： 好奇博士（ID：haoqi238） 参考文献 [1] Lavner JA, Bradbury T N. Patterns of change in marital satis-faction over the newlywed years[J]. Journal of Marriage andFamily, 2010,72(5):1171-1187. [2]徐安琪，叶文振。家庭生命周期和夫妻冲突的经验研究[J].中国人口科学，2002 (3):41-49. [3] He, D., Zhang, X.Y., Zhuang, Y. E., Wang, Z. L., &amp; Jiang, Y.(2019). China fertility report, 2006-2016: An analysis based onChina fertility survey 201", "points": ["本文转载自微信公众号： 好奇博士（ID：haoqi238） 参考文献 [1] Lavner JA, Bradbury T N. Patterns of change in marital satis-faction over the newlywed years[J]. Journal of Marriage andFamily, 2010,72(5):1171-1187. [2]徐安琪，叶文振。家庭生命周期和夫妻冲突的经验研究[J].中国人口科学，2002 (3):41-4…"], "takeaway": "", "link": "https://www.guokr.com/article/470022/", "source": "果壳科学人", "category": "science", "category_name": "科学与健康", "score": 92.7, "published": "2026-08-25T05:15:09+00:00", "ai": false}, {"title": "抖音：近一个月累计处置恶意营销号相关违规短视频145.34万条、违规账号59.75万个", "summary": "8月25日，抖音发布关于治理恶意营销号炒作涉企信息的公告。其中提到，近一个月，平台依据“账号健康分规则”，累计处置恶意营销号相关违规短视频145.34万条、违规账号59.75万个，具体包括但不限于内容减少推荐、下架违规视频、限制甚至封禁账号投稿功能及变现权益等措施。依托于“账号健康分”机制，35.8万个账号通过参与平台学习考试等方式实现加分，引导改善内容创作。后续平台将持续加大对恶意营销行为的打击力度，完善AI内容识别、矩阵账号检测等技术手段，同时欢迎用户通过举报渠道提供违规线索，共同维护网络环境。", "points": ["8月25日，抖音发布关于治理恶意营销号炒作涉企信息的公告。其中提到，近一个月，平台依据“账号健康分规则”，累计处置恶意营销号相关违规短视频145.34万条、违规账号59.75万个，具体包括但不限于内容减少推荐、下架违规视频、限制甚至封禁账号投稿功能及变现权益等措施。依托于“账号健康分”机制，35.8万个账号通过参与平台学习考试等方式实现加分，引导改善内容创作。后续平台将持续加大对恶意营销行为的打击力度，完善AI内容识别、矩阵账号检测等技术手段，同时欢迎用户通过举报渠道提供违规…"], "takeaway": "", "link": "https://www.jiemian.com/article/14987196.html", "source": "界面新闻", "category": "finance", "category_name": "财经与商业", "score": 92.4, "published": "2026-08-25T08:35:02+00:00", "ai": false}, {"title": "全总启动第二届班组长大赛，全国已有90万名班组职工报名", "summary": "据全国总工会8月25日消息，为全面加强企业班组建设，更好发挥产业工会作用，加快建设一支知识型、技能型、创新型产业工人大军，全国总工会办公厅近期印发了《关于举办第二届班组长大赛的通知》，全面启动大赛。 全总介绍，本届班组长大赛设置铁路、电力、医药、机械、冶金、建材、国防科技、信息通信、轻工、纺织等10个行业赛道，分网上报名及初赛、赛道决赛、成果交流三个阶段进行。企业班组成员可报名参加相应赛道初赛，班组长可晋级赛道决赛。各赛道决赛第1名且符合推荐条件的选手，按程序推荐申报全国五一劳动奖章。 全总表示，自8月10日大赛开放预报名以来，全国已有90万名班组职工报名，报名截止时间为9月5日24：00。自8月24日起，广大职工可登录“职工之家”APP，进入“劳动竞赛”模块“第二届班组长大赛”专区进行自主学习，参加网上练兵，获得学习证书。大赛初赛理论考试将于9月10日分时段在大赛专区进行，初赛成绩合格选", "points": ["据全国总工会8月25日消息，为全面加强企业班组建设，更好发挥产业工会作用，加快建设一支知识型、技能型、创新型产业工人大军，全国总工会办公厅近期印发了《关于举办第二届班组长大赛的通知》，全面启动大赛。 全总介绍，本届班组长大赛设置铁路、电力、医药、机械、冶金、建材、国防科技、信息通信、轻工、纺织等10个行业赛道，分网上报名及初赛、赛道决赛、成果交流三个阶段进行。企业班组成员可报名参加相应赛道初赛，班组长可晋级赛道决赛。各赛道决赛第1名且符合推荐条件的选手，按程序推荐申报全国五一…"], "takeaway": "", "link": "https://m.thepaper.cn/detail/33846011", "source": "澎湃时事", "category": "world", "category_name": "时事与国际", "score": 92.3, "published": "2026-08-25T07:25:08+00:00", "ai": false}, {"title": "最高时速160公里，京冀首条跨省域地铁空载试运行", "summary": "记者从北京市重大项目办和京投轨道公司获悉，京冀首条跨省域城市轨道交通北京地铁22号线（红庙站—平谷站）25日启动空载试运行，为2026年底基本开通奠定基础。 空载试运行将分两个阶段实施：第一阶段重点开展车辆、信号、通信等八大系统的综合联调与功能测试；第二阶段将开展“跑图”试运行，对列车正点率、运行图兑现率等关键指标进行验证，确保线路运行指标达到初期运营前安全评估标准。 北京地铁22号线（红庙站—平谷站）全长约79.1公里，共设车站20座，线路串联北京CBD核心区、北京城市副中心、河北三河市燕郊镇、北京平谷中心城等重点功能区。 线路速度优势明显，高架段最高时速达160公里，地下段达120公里。从河北三河市燕郊镇到北京城市副中心最快约9分钟、到北京CBD核心区红庙站最快约28分钟。 作为“轨道上的京津冀”标志性项目，线路建成后也将历史性实现河北三河市与北京城市轨道交通网的“无缝衔接”，进一步推", "points": ["记者从北京市重大项目办和京投轨道公司获悉，京冀首条跨省域城市轨道交通北京地铁22号线（红庙站—平谷站）25日启动空载试运行，为2026年底基本开通奠定基础。 空载试运行将分两个阶段实施：第一阶段重点开展车辆、信号、通信等八大系统的综合联调与功能测试；第二阶段将开展“跑图”试运行，对列车正点率、运行图兑现率等关键指标进行验证，确保线路运行指标达到初期运营前安全评估标准。 北京地铁22号线（红庙站—平谷站）全长约79.1公里，共设车站20座，线路串联北京CBD核心区、北京城市副中…"], "takeaway": "", "link": "https://m.thepaper.cn/detail/33845967", "source": "澎湃时事", "category": "world", "category_name": "时事与国际", "score": 92.0, "published": "2026-08-25T07:01:39+00:00", "ai": false}, {"title": "陶韵筑匠心 广西北流上演陶艺争锋", "summary": "图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄", "points": ["图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者…"], "takeaway": "", "link": "https://www.chinanews.com.cn/tp/2026/08-25/10683945.shtml", "source": "中新滚动", "category": "society", "category_name": "社会与深度", "score": 91.4, "published": "2026-08-25T08:53:10+00:00", "ai": false}, {"title": "纪念鲁迅诞辰145周年 “鲁迅文学周”在上海启幕", "summary": "图为读者在鲁迅先生墓前缅怀。中新社记者 张亨伟 摄 图为鲁迅长孙周令飞向鲁迅先生墓敬献鲜花。中新社记者 张亨伟 摄 图为鲁迅长孙周令飞接受媒体采访。中新社记者 张亨伟 摄 图为鲁迅长孙周令飞(右)向鲁迅先生墓敬献鲜花。中新社记者 张亨伟 摄 图为鲁迅相关的文创产品吸引读者驻足挑选。中新社记者 张亨伟 摄 图为“鲁迅文学周”在上海鲁迅公园开幕。中新社记者 张亨伟 摄", "points": ["图为读者在鲁迅先生墓前缅怀。中新社记者 张亨伟 摄 图为鲁迅长孙周令飞向鲁迅先生墓敬献鲜花。中新社记者 张亨伟 摄 图为鲁迅长孙周令飞接受媒体采访。中新社记者 张亨伟 摄 图为鲁迅长孙周令飞(右)向鲁迅先生墓敬献鲜花。中新社记者 张亨伟 摄 图为鲁迅相关的文创产品吸引读者驻足挑选。中新社记者 张亨伟 摄 图为“鲁迅文学周”在上海鲁迅公园开幕。中新社记者 张亨伟 摄"], "takeaway": "", "link": "https://www.chinanews.com.cn/tp/2026/08-25/10683908.shtml", "source": "中新滚动", "category": "society", "category_name": "社会与深度", "score": 91.4, "published": "2026-08-25T08:51:40+00:00", "ai": false}, {"title": "聚焦中国经济核心议题，人民日报连发4篇“钟才文”", "summary": "2026年8月22日起，《人民日报》连续四天刊发“钟才文”署名文章，聚焦中国经济核心议题，权威解读当前经济形势，并对未来发展方向作了进一步分析。 8月25日，最新一篇《推动高质量发展行稳致远》刊发于《人民日报》第二版。文章为下半年经济工作指引方向：要深入贯彻落实党中央决策部署，加大逆周期调节力度，充分发挥各项存量政策效能，及时谋划出台务实管用的增量政策，增强发展动力、激发社会活力。 文章分别从宏观政策、国内需求、产业体系、市场环境、国际经贸等方面展开论述。 比如，宏观政策方面，文章提到，“积极作为，宏观政策要发力提效。继续实施好更加积极的财政政策和适度宽松的货币政策。今年上半年，全国国库日均库款规模相对较大，反映出财政可用资金较多。要加快财政支出和债券资金使用进度，尽快形成实物工作量。强化财政运行监测和库款调度，兜牢基层‘三保’底线。要综合运用并适时调整货币政策工具，保持流动性充裕，畅通货", "points": ["2026年8月22日起，《人民日报》连续四天刊发“钟才文”署名文章，聚焦中国经济核心议题，权威解读当前经济形势，并对未来发展方向作了进一步分析。 8月25日，最新一篇《推动高质量发展行稳致远》刊发于《人民日报》第二版。文章为下半年经济工作指引方向：要深入贯彻落实党中央决策部署，加大逆周期调节力度，充分发挥各项存量政策效能，及时谋划出台务实管用的增量政策，增强发展动力、激发社会活力。 文章分别从宏观政策、国内需求、产业体系、市场环境、国际经贸等方面展开论述。 比如，宏观政策方面…"], "takeaway": "", "link": "https://m.thepaper.cn/detail/33844455", "source": "澎湃时事", "category": "world", "category_name": "时事与国际", "score": 89.1, "published": "2026-08-25T02:05:19+00:00", "ai": false}, {"title": "2026年上半年德国财政赤字增至713亿欧元", "summary": "中新网柏林8月25日电(记者 马秀秀)根据德国联邦统计局25日发布的初步数据，2026年上半年，德国财政赤字增至713亿欧元，较去年同期增加366亿欧元。按照国内生产总值计算，2026年上半年赤字率为3.1%。", "points": ["中新网柏林8月25日电(记者 马秀秀)根据德国联邦统计局25日发布的初步数据，2026年上半年，德国财政赤字增至713亿欧元，较去年同期增加366亿欧元。按照国内生产总值计算，2026年上半年赤字率为3.1%。"], "takeaway": "", "link": "https://www.chinanews.com.cn/gj/2026/08-25/10683928.shtml", "source": "中新国际", "category": "world", "category_name": "时事与国际", "score": 88.7, "published": "2026-08-25T08:42:51+00:00", "ai": false}, {"title": "处暑防温燥 药膳巧安排", "summary": "处暑节气的到来，意味着炎热的夏天即将结束，暑气开始消退，天气逐渐向凉爽的秋天过渡。立秋以后，燥气当令，暑热余威尚存，燥气与热邪相加，很容易让人患上“温燥”，出现嗓子干、咳嗽、上火等症状，也就是民间常说的“秋老虎咬人”。针对这个时节的气候特点，推荐几款药膳茶饮供大家选择使用。", "points": ["处暑节气的到来，意味着炎热的夏天即将结束，暑气开始消退，天气逐渐向凉爽的秋天过渡。立秋以后，燥气当令，暑热余威尚存，燥气与热邪相加，很容易让人患上“温燥”，出现嗓子干、咳嗽、上火等症状，也就是民间常说的“秋老虎咬人”。针对这个时节的气候特点，推荐几款药膳茶饮供大家选择使用。"], "takeaway": "", "link": "https://www.chinanews.com.cn/jk/2026/08-25/10683800.shtml", "source": "中新健康", "category": "science", "category_name": "科学与健康", "score": 88.7, "published": "2026-08-25T05:39:38+00:00", "ai": false}, {"title": "霍尔木兹海峡通行数量降至新低 美国称不排除武力打击", "summary": "中新社北京8月25日电 综合消息：船舶追踪机构克普勒公司最新数据显示，当地时间24日通过霍尔木兹海峡的商船数量降至3个多月以来最低水平。美国国防部长赫格塞思当天称，不排除在霍尔木兹海峡或伊朗周边地区动用武力的可能。", "points": ["中新社北京8月25日电 综合消息：船舶追踪机构克普勒公司最新数据显示，当地时间24日通过霍尔木兹海峡的商船数量降至3个多月以来最低水平。美国国防部长赫格塞思当天称，不排除在霍尔木兹海峡或伊朗周边地区动用武力的可能。"], "takeaway": "", "link": "https://www.chinanews.com.cn/gj/2026/08-25/10683873.shtml", "source": "中新国际", "category": "world", "category_name": "时事与国际", "score": 88.4, "published": "2026-08-25T07:57:22+00:00", "ai": false}, {"title": "看到这种“巨型蒲公英”，别吹别摘！吹一口可能罚100元！", "summary": "今年初夏，在北京、山东和辽宁等北方省市出现了大量“巨型蒲公英”，这些蒲公英的“毛球”比拳头还大，许多人玩得不亦乐乎，甚至专程“拍照打卡”。 巨型蒲公英丨小红书 但很多公园管理部门发出提醒： 这种“巨型蒲公英”虽然颜值很高，但最好只看不动——别吹、别摘，更不要随意带回家（根据《北京市公园条例》，采挖植物属于公园内禁止行为，违规可处50元以上100元以下罚款）。 北京某公园成片生长的“巨型蒲公英”丨参考文献[1] 很多人问：它们不就是“升级版”的蒲公英吗？吹散种子不是在帮它们繁殖吗？为什么不让吹？ 真假蒲公英 细看一下，我们不难发现，除了有着酷似蒲公英的毛球状果序，所谓的“巨型蒲公英”与真正的蒲公英（蒲公英属Taraxacum）气质迥异。 经相关学者鉴定，它的 真实身份是长喙婆罗门参（Tragopogon dubius）， 与蒲公英都是菊科（Asteraceae）莴苣族（Lactucinae）", "points": ["今年初夏，在北京、山东和辽宁等北方省市出现了大量“巨型蒲公英”，这些蒲公英的“毛球”比拳头还大，许多人玩得不亦乐乎，甚至专程“拍照打卡”。 巨型蒲公英丨小红书 但很多公园管理部门发出提醒： 这种“巨型蒲公英”虽然颜值很高，但最好只看不动——别吹、别摘，更不要随意带回家（根据《北京市公园条例》，采挖植物属于公园内禁止行为，违规可处50元以上100元以下罚款）。 北京某公园成片生长的“巨型蒲公英”丨参考文献[1] 很多人问：它们不就是“升级版”的蒲公英吗？吹散种子不是在帮它们繁殖…"], "takeaway": "", "link": "https://www.guokr.com/article/470018/", "source": "果壳科学人", "category": "science", "category_name": "科学与健康", "score": 87.7, "published": "2026-08-24T21:15:12+00:00", "ai": false}, {"title": "医疗保障法草案三审 对特困人员等参加城乡居民基本医保给予资助", "summary": "中新网北京8月25日电 (记者 郭超凯)医疗保障法草案25日提请十四届全国人大常委会三次审议。草案三审稿增加规定，特困人员、最低生活保障家庭成员、符合条件的防止返贫致贫对象等参加城乡居民基本医疗保险的，其个人缴费部分按照规定给予资助。", "points": ["中新网北京8月25日电 (记者 郭超凯)医疗保障法草案25日提请十四届全国人大常委会三次审议。草案三审稿增加规定，特困人员、最低生活保障家庭成员、符合条件的防止返贫致贫对象等参加城乡居民基本医疗保险的，其个人缴费部分按照规定给予资助。"], "takeaway": "", "link": "https://www.chinanews.com.cn/jk/2026/08-25/10683627.shtml", "source": "中新健康", "category": "science", "category_name": "科学与健康", "score": 84.4, "published": "2026-08-25T02:01:18+00:00", "ai": false}, {"title": "为人民出政绩 以实干出政绩——习近平总书记重要指示激励全党树立和践行正确政绩观不断创造高质量发展新业绩", "summary": "为人民出政绩 以实干出政绩——习近平总书记重要指示激励全党树立和践行正确政绩观不断创造高质量发展新业绩", "points": ["为人民出政绩 以实干出政绩——习近平总书记重要指示激励全党树立和践行正确政绩观不断创造高质量发展新业绩"], "takeaway": "", "link": "https://www.news.cn/politics/leaders/20260824/46fe6d8f3be04ecaad7365ebc0975503/c.html", "source": "澎湃文化", "category": "culture", "category_name": "文化与思想", "score": 80.3, "published": "2026-08-25T07:27:04+00:00", "ai": false}, {"title": "拾光纪·约旦国王第九次访华，习主席同他谈了这些大事", "summary": "拾光纪·约旦国王第九次访华，习主席同他谈了这些大事", "points": ["拾光纪·约旦国王第九次访华，习主席同他谈了这些大事"], "takeaway": "", "link": "https://www.peopleapp.com/column/30053004779-500007665552", "source": "澎湃文化", "category": "culture", "category_name": "文化与思想", "score": 77.9, "published": "2026-08-25T07:26:40+00:00", "ai": false}, {"title": "牛来，关于成长——粗粝外壳下的温柔哲思", "summary": "《牛来》虽然表层制作粗粝，难掩内在肌理的细腻真诚。", "points": ["《牛来》虽然表层制作粗粝，难掩内在肌理的细腻真诚。"], "takeaway": "", "link": "https://movie.douban.com/review/17787595/", "source": "豆瓣影评", "category": "culture", "category_name": "文化与思想", "score": 75.7, "published": "2026-08-25T06:23:22+00:00", "ai": false}, {"title": "《花束般的恋爱》——我们相遇时其实就是分开时，我们拥有时就到了失去时。", "summary": "花束般的恋爱  评价: 推荐", "points": ["花束般的恋爱 评价: 推荐"], "takeaway": "", "link": "https://movie.douban.com/review/17787500/", "source": "豆瓣影评", "category": "culture", "category_name": "文化与思想", "score": 73.9, "published": "2026-08-25T05:05:51+00:00", "ai": false}, {"title": "《本质之书》译后记", "summary": "关于翻译", "points": ["关于翻译"], "takeaway": "", "link": "https://book.douban.com/review/17785112/", "source": "豆瓣书评", "category": "culture", "category_name": "文化与思想", "score": 57.6, "published": "2026-08-24T00:55:11+00:00", "ai": false}], "page_url": ""};
+const DIGEST = {"date": "2026-08-25", "generated_at": "2026-08-25T09:16:58.370721+00:00", "total": 30, "categories": [{"id": "finance", "name": "财经与商业", "count": 5}, {"id": "science", "name": "科学与健康", "count": 5}, {"id": "tech_ai", "name": "科技与 AI", "count": 5}, {"id": "society", "name": "社会与深度", "count": 5}, {"id": "world", "name": "时事与国际", "count": 5}, {"id": "culture", "name": "文化与思想", "count": 5}], "items": [{"title": "任少卿做机器人，蔚来留下一个AI入口", "summary": "蔚来智能驾驶负责人任少卿，有了第二个身份。 华尔街见闻获悉，8月24日，蔚来CEO李斌在智驾全员会上宣布，任少卿已经创立一家聚焦物理AI基础模型和具身智能的独立公司。蔚来将战略投资，并与新公司开展合作。 任少卿并未离职。一名接近蔚来人士表示，任少卿将继续全面负责蔚来智驾，职务和职责不变。 这是一种少见的安排。任少卿成为独立公司的创业者，同时仍掌管蔚来最核心的技术业务之一。 任少卿于2020年加入蔚来，推动其高阶智驾从传统模块化方案转向端到端和世界模型，并参与神玑NX9031智驾芯片的量产落地。蔚来从2023年启动世界模型研发，2025年开始量产推送。今年6月，最新版本覆盖超过70万用户。 智能驾驶与具身智能都要解决机器如何感知环境、预测变化并作出动作，世界模型、强化学习等技术可以共享研究方法。只是从汽车走向机器人，还要补上本体硬件、操作数据、供应链和应用场景。 接近蔚来管理层的人士在8月2", "points": ["蔚来智能驾驶负责人任少卿，有了第二个身份。 华尔街见闻获悉，8月24日，蔚来CEO李斌在智驾全员会上宣布，任少卿已经创立一家聚焦物理AI基础模型和具身智能的独立公司。蔚来将战略投资，并与新公司开展合作。 任少卿并未离职。一名接近蔚来人士表示，任少卿将继续全面负责蔚来智驾，职务和职责不变。 这是一种少见的安排。任少卿成为独立公司的创业者，同时仍掌管蔚来最核心的技术业务之一。 任少卿于2020年加入蔚来，推动其高阶智驾从传统模块化方案转向端到端和世界模型，并参与神玑NX9031智…"], "takeaway": "", "link": "https://wallstreetcn.com/articles/3780246", "source": "华尔街见闻", "category": "finance", "category_name": "财经与商业", "score": 94.2, "published": "2026-08-25T08:57:08+00:00", "ai": false}, {"title": "第一批染腋毛的年轻人，全靠“不想忍了”", "summary": "染腋毛，成了女孩们和腋毛相处的新方式。 撰文：娃娃菜 编辑：木也 封面来源：受访者提供 一把刷子、一盒50元的漂膏。小葵站在卫生间里，身上只穿着内衣，一只手高举过头顶，另一只手有些费力地把漂膏刷在腋下。刺痛感像细针一样扎进来，她咬牙保持着这个姿势，胳膊因为举了太久有些酸得发抖。 她要把自己的腋毛染成金色。 因为腋毛又硬又卷，还只能单手操作，要保证每一根毛都均匀地裹上了漂膏并非易事；涂完还要一直举着双手等待掉色，什么事都做不了。原地罚站半个小时后，即使事前涂了身体乳做保护， 小葵腋下的皮肤还是被漂膏刺激得通红，但腋毛的颜色却一根没变。 不死心的小葵又用眉毛漂膏重新涂一遍，再熬一轮，前后折腾两个多小时，她终于得到了金色的腋毛。 选金色的原因不是因为喜欢，这已经是相对省事的颜色，只漂一道，不用二次上色。 想要获得蓝色腋毛，则需要先漂再上色丨 要问小葵对染腋毛的最大感受，那就是远比想象中麻烦。但即", "points": ["染腋毛，成了女孩们和腋毛相处的新方式。 撰文：娃娃菜 编辑：木也 封面来源：受访者提供 一把刷子、一盒50元的漂膏。小葵站在卫生间里，身上只穿着内衣，一只手高举过头顶，另一只手有些费力地把漂膏刷在腋下。刺痛感像细针一样扎进来，她咬牙保持着这个姿势，胳膊因为举了太久有些酸得发抖。 她要把自己的腋毛染成金色。 因为腋毛又硬又卷，还只能单手操作，要保证每一根毛都均匀地裹上了漂膏并非易事；涂完还要一直举着双手等待掉色，什么事都做不了。原地罚站半个小时后，即使事前涂了身体乳做保护， 小…"], "takeaway": "", "link": "https://www.guokr.com/article/470024/", "source": "果壳科学人", "category": "science", "category_name": "科学与健康", "score": 94.0, "published": "2026-08-25T08:15:07+00:00", "ai": false}, {"title": "北方华创上半年营收同比增25%，净利润增长5%至33.7亿｜财报见闻", "summary": "北方华创公告，2026年上半年营业收入201.61亿元，同比增长24.90%；归属于上市公司股东的净利润33.7亿元，同比增长5.05%，2025年同期为32.08亿元；归属于上市公司股东的扣除非经常性损益的净利润33.41亿元，同比增长5.02%，2025年同期为31.81亿元。公司计划不派发现金红利，不送红股，不以公积金转增股本。 &nbsp; 风险提示及免责条款 市场有风险，投资需谨慎。本文不构成个人投资建议，也未考虑到个别用户特殊的投资目标、财务状况或需要。用户应考虑本文中的任何意见、观点或结论是否符合其特定状况。据此投资，责任自负。", "points": ["北方华创公告，2026年上半年营业收入201.61亿元，同比增长24.90%；归属于上市公司股东的净利润33.7亿元，同比增长5.05%，2025年同期为32.08亿元；归属于上市公司股东的扣除非经常性损益的净利润33.41亿元，同比增长5.02%，2025年同期为31.81亿元。公司计划不派发现金红利，不送红股，不以公积金转增股本。 &nbsp; 风险提示及免责条款 市场有风险，投资需谨慎。本文不构成个人投资建议，也未考虑到个别用户特殊的投资目标、财务状况或需要。用户应考虑…"], "takeaway": "", "link": "https://wallstreetcn.com/articles/3780249", "source": "华尔街见闻", "category": "finance", "category_name": "财经与商业", "score": 93.9, "published": "2026-08-25T09:06:12+00:00", "ai": false}, {"title": "火线评论｜45岁的任羽中贪腐近20年，北大不应如此“兼容并包”", "summary": "任羽中们多了，高校的内部生态就会被严重侵蚀。学者们为了完成考核任务，发论文，疲于奔命，而高校管理层却“靠校吃校”，着实令人意难平 8月24日，辽宁丹东中院发布消息称，该院对任羽中以受贿罪判处有期徒刑8年，并处罚金260万元；对任羽中受贿犯罪所得财物及孳息予以追缴，上缴国库。图：央视新闻 【财新网】/火线评论 就在北京大学某经济学教授的言论引发广泛争议之时，北京大学原副校长任羽中受贿案一审落槌。若论炒作热度，前者当胜；若论对北大建设之影响以及对中国高校形象造成的冲击，后者远超前者，根本不是一个数量级。学术问题见仁见智，贪腐则人神共愤。 8月24日，辽宁丹东中院发布消息称，该院对任羽中以受贿罪判处有期徒刑8年，并处罚金260万元；对任羽中受贿犯罪所得财物及孳息予以追缴，上缴国库。法院经审理查明：2006年至2025年，任羽中为相关单位和个人在教育培训、升学就业等事项上提供帮助，非法收受财物共计", "points": ["任羽中们多了，高校的内部生态就会被严重侵蚀。学者们为了完成考核任务，发论文，疲于奔命，而高校管理层却“靠校吃校”，着实令人意难平 8月24日，辽宁丹东中院发布消息称，该院对任羽中以受贿罪判处有期徒刑8年，并处罚金260万元；对任羽中受贿犯罪所得财物及孳息予以追缴，上缴国库。图：央视新闻 【财新网】/火线评论 就在北京大学某经济学教授的言论引发广泛争议之时，北京大学原副校长任羽中受贿案一审落槌。若论炒作热度，前者当胜；若论对北大建设之影响以及对中国高校形象造成的冲击，后者远超前…"], "takeaway": "", "link": "https://opinion.caixin.com/2026-08-25/102477789.html", "source": "财新网", "category": "finance", "category_name": "财经与商业", "score": 93.9, "published": "2026-08-25T08:50:39+00:00", "ai": false}, {"title": "美国计划再次对 H1B 签证征收 10 万美元费用，计划吊销 20 万商务或旅游签证", "summary": "美国总统特朗普于 2025 年 9 月签署总统令，规定申请 H1B 签证需缴纳 10 万美元手续费。但联邦地区法院今年 6 月判定这一措施违法并予以撤销。本周一特朗普政府公布了新草案，计划再次对 H1B 签证收取 10 万 3265 美元手续费。国土安全部表示，虽然新规草案规定的金额与总统令相近，但两者并非同一措施，法律依据也不同。根据新规草案，这笔附加手续费将在现行数千美元手续费的基础上另行收取，目的是用于“各政府部门合法移民系统的运营费用”，包括移民局系统现代化以及检测违规行为等。与此同时，特朗普政府还计划吊销多达 20 万名外国人的商务或旅游签证（B1 和 B2 签证）。如果这一计划得以实施，这将是美国历史上规模最大的单次签证吊销行动。", "points": ["美国总统特朗普于 2025 年 9 月签署总统令，规定申请 H1B 签证需缴纳 10 万美元手续费。但联邦地区法院今年 6 月判定这一措施违法并予以撤销。本周一特朗普政府公布了新草案，计划再次对 H1B 签证收取 10 万 3265 美元手续费。国土安全部表示，虽然新规草案规定的金额与总统令相近，但两者并非同一措施，法律依据也不同。根据新规草案，这笔附加手续费将在现行数千美元手续费的基础上另行收取，目的是用于“各政府部门合法移民系统的运营费用”，包括移民局系统现代化以及检测违…"], "takeaway": "", "link": "https://www.solidot.org/story?sid=85188", "source": "Solidot", "category": "tech_ai", "category_name": "科技与 AI", "score": 93.8, "published": "2026-08-25T07:23:25+00:00", "ai": false}, {"title": "突破具身智能物理死角：IJCAI 2026 具身智能泛化与控制突破", "summary": "告别理想仿真，中国学术团队用物理工程方案回应落地挑战。 &nbsp; &nbsp; 作者丨 张璐 &nbsp; &nbsp; 编辑丨 岑峰 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &", "points": ["告别理想仿真，中国学术团队用物理工程方案回应落地挑战。 &nbsp; &nbsp; 作者丨 张璐 &nbsp; &nbsp; 编辑丨 岑峰 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &n…"], "takeaway": "", "link": "https://www.leiphone.com/category/private/5YB9zkA19rHTGz0o.html", "source": "雷锋网", "category": "tech_ai", "category_name": "科技与 AI", "score": 93.5, "published": "2026-08-25T06:42:00+00:00", "ai": false}, {"title": "阿里云 Token Plan 接入千问 App 及 PC 端，支持 Qwen3.8-Max 等模型", "summary": "IT之家 8 月 25 日消息，阿里云今日宣布， 阿里云 Token Plan 正式接入千问 App 及 PC 端 。用户只需将 API Key 绑定至千问，即可直接调用 Token Plan 订阅额度， 支持 Qwen3.8-Max 等模型 。 IT之家获悉，千问 App 用户可在工作助理中添加 Token Plan 的 API Key 完成绑定。使用工作助理执行复杂任务时，例如操作电脑和浏览器、调用 skill 来交付 office 文档、应用和网站等，都可直接使用 Token Plan 订阅额度。 据介绍，阿里云 Token Plan 支持在 Qoder、Codex 等 AI 工具中使用统一 API Key、按需自主切换模型，获得更稳定、灵活的模型服务。 千问工作助理可围绕用户目标自主拆解任务、调用工具，并连接邮件、日历、网盘、浏览器等应用，处理 Word、Excel、PPT 等常见", "points": ["IT之家 8 月 25 日消息，阿里云今日宣布， 阿里云 Token Plan 正式接入千问 App 及 PC 端 。用户只需将 API Key 绑定至千问，即可直接调用 Token Plan 订阅额度， 支持 Qwen3.8-Max 等模型 。 IT之家获悉，千问 App 用户可在工作助理中添加 Token Plan 的 API Key 完成绑定。使用工作助理执行复杂任务时，例如操作电脑和浏览器、调用 skill 来交付 office 文档、应用和网站等，都可直接使用 To…"], "takeaway": "", "link": "https://www.ithome.com/0/994/095.htm", "source": "IT之家", "category": "tech_ai", "category_name": "科技与 AI", "score": 93.4, "published": "2026-08-25T08:57:41+00:00", "ai": false}, {"title": "vivo X500 Pro Max 手机现身 Geekbench，天玑 9600 Pro 芯片", "summary": "IT之家 8 月 25 日消息，一款型号为 V2610 的 vivo 新机近日出现在 Geekbench 跑分数据库，科技媒体 GSMArena 认为该机是 vivo X500 Pro Max。 从数据库信息来看， 这款手机搭载联发科 MT6995 芯片 ，拥有 8 个核心，主频最高 4.55GHz，配备 12GB 内存，运行 Android 17 操作系统。 同时， 该机在 Geekbench 6 测试中录得单核 2574 分 、 多核 7756 分的成绩 。 据微博博主 @数码闲聊站 此前爆料，vivo X500 Pro Max 预计将配备联发科天玑 9600 Pro 芯片。该机的「蓝图光御 900」为 50MP 1/1.28\" 主摄。此外，该机还搭载 X300 Ultra 超大杯同款的 2 亿灭霸长焦，200MP HP0 定制大底潜望。 IT之家注意到，vivo X500 系列手机将", "points": ["IT之家 8 月 25 日消息，一款型号为 V2610 的 vivo 新机近日出现在 Geekbench 跑分数据库，科技媒体 GSMArena 认为该机是 vivo X500 Pro Max。 从数据库信息来看， 这款手机搭载联发科 MT6995 芯片 ，拥有 8 个核心，主频最高 4.55GHz，配备 12GB 内存，运行 Android 17 操作系统。 同时， 该机在 Geekbench 6 测试中录得单核 2574 分 、 多核 7756 分的成绩 。 据微博博主…"], "takeaway": "", "link": "https://www.ithome.com/0/994/094.htm", "source": "IT之家", "category": "tech_ai", "category_name": "科技与 AI", "score": 93.4, "published": "2026-08-25T08:55:58+00:00", "ai": false}, {"title": "Firefox 和 Chrome 准备启用对 JPEG XL 的支持", "summary": "Firefox 和 Chrome 都宣布准备启用对 JPEG XL 的支持。JPEG XL 是一种免版税的位图文件格式，支持有损和无损压缩。它旨在超越现有的位图格式，并成为它们的通用替代。Google Chrome 在 2023 年 移除了对实验性的 JPEG-XL 图像格式的支持，引发了很多争议，因为 Chrome/Chromium 占据了九成市场份额，它是 Web 标准事实上的仲裁者。但到了 2025 年 Google 改变了主意，Chrome/Chromium 加入了 Rust 语言开发的 JPEG-XL 图像解码器 jxl-rs，但对 JPEG-XL 的支持还没有默认启用。Mozilla 开发者通过邮件列表宣布即将释出的 Firefox 157 将默认启用对 JPEG XL 的支持。Google 也宣布准备默认启用。苹果的 Safari 则早在 2023 年就加入了对 JPEG-X", "points": ["Firefox 和 Chrome 都宣布准备启用对 JPEG XL 的支持。JPEG XL 是一种免版税的位图文件格式，支持有损和无损压缩。它旨在超越现有的位图格式，并成为它们的通用替代。Google Chrome 在 2023 年 移除了对实验性的 JPEG-XL 图像格式的支持，引发了很多争议，因为 Chrome/Chromium 占据了九成市场份额，它是 Web 标准事实上的仲裁者。但到了 2025 年 Google 改变了主意，Chrome/Chromium 加入了…"], "takeaway": "", "link": "https://www.solidot.org/story?sid=85187", "source": "Solidot", "category": "tech_ai", "category_name": "科技与 AI", "score": 93.4, "published": "2026-08-25T06:45:01+00:00", "ai": false}, {"title": "观察｜现代化首都都市圈建设，给天津武清带来了怎样的机遇？", "summary": "在一个国民“种草”生活平台上，“京津通勤”“武清”等相关词条浏览量超过2000万次。 无数年轻人分享着双城生活。清晨6点半，他们在京津城际武清站的闸机口排起了队。刷卡、进站、落座。22分钟后，列车稳稳停靠北京南站。出站、换乘地铁，不到8点，有人在北京国贸写字楼里接上了第一杯咖啡。 2026年1月22日，《现代化首都都市圈空间协同规划（2023—2035年）》（以下简称《规划》）正式获批。《规划》将天津市武清区纳入通勤圈，天津全域纳入功能圈。作为天津唯一全域纳入首都通勤圈的行政区，武清正凭借发达的立体交通网让京津两地往来更便捷。 2025年，京津跨城日均出行量已达22.5万人次。武清实有人口从2022年末的113万人增长至目前的121.2万人。这座地处京津走廊节点的城区，不再只是往来过客的途经之地，而在吸引越来越多人安家兴业。 撑实通勤骨架，交通路网 四通八达 2026年6月29日，京津城际", "points": ["在一个国民“种草”生活平台上，“京津通勤”“武清”等相关词条浏览量超过2000万次。 无数年轻人分享着双城生活。清晨6点半，他们在京津城际武清站的闸机口排起了队。刷卡、进站、落座。22分钟后，列车稳稳停靠北京南站。出站、换乘地铁，不到8点，有人在北京国贸写字楼里接上了第一杯咖啡。 2026年1月22日，《现代化首都都市圈空间协同规划（2023—2035年）》（以下简称《规划》）正式获批。《规划》将天津市武清区纳入通勤圈，天津全域纳入功能圈。作为天津唯一全域纳入首都通勤圈的行政…"], "takeaway": "", "link": "https://m.thepaper.cn/detail/33846389", "source": "澎湃精选", "category": "society", "category_name": "社会与深度", "score": 93.3, "published": "2026-08-25T09:05:25+00:00", "ai": false}, {"title": "“请3休13”，中秋国庆预订开启“加速”模式：长线游产品密集成团", "summary": "进入八月下旬，2026年暑期旅游进入收官阶段。多家在线旅游平台的报告显示，暑期最后阶段，出行热度不减，随着县城游“消费升级”，民宿成为深度体验的新入口，长线出境游也加速回暖。与此同时，受“请3休13”超长拼假窗口带动，中秋国庆的机票与度假产品预订已提前进入加速通道，暑期旺季正与双节预订潮无缝衔接。 县城游“消费升级”，中产家庭带娃涌向宝藏小城 去哪儿旅行数据显示，2026年暑假，酒店和民宿预订火爆，遍布全国千余个县城。连住3天以上的游客同比增长两成，贵州兴义、江西铅山等一批宝藏小城酒店预订量同比翻番。暑期最热门的县城（含县级市）目的地TOP10包括：云南大理、贵州兴义、新疆伊宁、云南景洪、云南香格里拉、甘肃敦煌、新疆喀什、福建平潭、广西阳朔、吉林延吉。 这个暑假，县城不再是“便宜”的代名词，县城里的高品质住宿尤其抢手。去哪儿数据显示，暑期县城四星及以上酒店订单同比增速达两位数，高星酒店占比", "points": ["进入八月下旬，2026年暑期旅游进入收官阶段。多家在线旅游平台的报告显示，暑期最后阶段，出行热度不减，随着县城游“消费升级”，民宿成为深度体验的新入口，长线出境游也加速回暖。与此同时，受“请3休13”超长拼假窗口带动，中秋国庆的机票与度假产品预订已提前进入加速通道，暑期旺季正与双节预订潮无缝衔接。 县城游“消费升级”，中产家庭带娃涌向宝藏小城 去哪儿旅行数据显示，2026年暑假，酒店和民宿预订火爆，遍布全国千余个县城。连住3天以上的游客同比增长两成，贵州兴义、江西铅山等一批宝…"], "takeaway": "", "link": "https://m.thepaper.cn/detail/33846468", "source": "澎湃精选", "category": "society", "category_name": "社会与深度", "score": 93.3, "published": "2026-08-25T09:15:43+00:00", "ai": false}, {"title": "北部湾一海底天然气管线环评获批 环境部要求施工期间保护布氏鲸", "summary": "布氏鲸是国家一级重点保护野生动物，北海涠洲岛海域的布氏鲸是中国大陆唯一近岸分布的大型鲸类生活群体 【财新网】 生态环境部近日批复《涠洲12—1 PUQ到涠洲终端天然气管线项目环境影响报告书》（下称“环评报告书”），原则同意环评报告书的总体结论和拟采取的生态环境保护措施。环境部在上述批复中要求，项目合理安排施工时间，定向钻及海底管道挖沟施工应避开布氏鲸主要活动期（1月至4月）。施工期加强瞭望，发现布氏鲸、中华白海豚等珍贵、濒危海洋动物，应立即停止施工，待其游离后方可施工。若发现布氏鲸、中华白海豚等受伤，应及时采取紧急救护措施并报告相关部门处理。", "points": ["布氏鲸是国家一级重点保护野生动物，北海涠洲岛海域的布氏鲸是中国大陆唯一近岸分布的大型鲸类生活群体 【财新网】 生态环境部近日批复《涠洲12—1 PUQ到涠洲终端天然气管线项目环境影响报告书》（下称“环评报告书”），原则同意环评报告书的总体结论和拟采取的生态环境保护措施。环境部在上述批复中要求，项目合理安排施工时间，定向钻及海底管道挖沟施工应避开布氏鲸主要活动期（1月至4月）。施工期加强瞭望，发现布氏鲸、中华白海豚等珍贵、濒危海洋动物，应立即停止施工，待其游离后方可施工。若发现…"], "takeaway": "", "link": "https://science.caixin.com/2026-08-25/102477776.html", "source": "财新网", "category": "finance", "category_name": "财经与商业", "score": 93.2, "published": "2026-08-25T07:56:32+00:00", "ai": false}, {"title": "十四届全国人大常委会第二十四次会议在京举行", "summary": "十四届全国人大常委会第二十四次会议25日上午在北京人民大会堂举行第一次全体会议。赵乐际委员长主持。 常委会组成人员149人出席会议，出席人数符合法定人数。 会议听取了全国人大宪法和法律委员会副主任委员丛斌作的关于医疗保障法草案审议结果的报告。草案三审稿在立法目的中增加“落实健康优先发展战略”，进一步完善医疗保障体系有关规定，充实医疗保障基金使用、管理有关规定，细化异地就医医药费用结算要求，增加长期护理保险相关规定，完善有关法律责任规定等。 会议听取了宪法和法律委员会主任委员信春鹰作的关于耕地保护和质量提升法草案审议结果的报告。草案三审稿增加鼓励高等学校、科研院所等加强耕地保护和质量提升方面人才培养的规定；明确河湖管理范围内的土地原则上不作为补充耕地来源；强化对高标准农田建设资金的监督管理；增加对沙化、风蚀、水蚀耕地开展综合治理，预防和治理水土流失的规定；加大对黑土地的保护力度等。 会议听取", "points": ["十四届全国人大常委会第二十四次会议25日上午在北京人民大会堂举行第一次全体会议。赵乐际委员长主持。 常委会组成人员149人出席会议，出席人数符合法定人数。 会议听取了全国人大宪法和法律委员会副主任委员丛斌作的关于医疗保障法草案审议结果的报告。草案三审稿在立法目的中增加“落实健康优先发展战略”，进一步完善医疗保障体系有关规定，充实医疗保障基金使用、管理有关规定，细化异地就医医药费用结算要求，增加长期护理保险相关规定，完善有关法律责任规定等。 会议听取了宪法和法律委员会主任委员信…"], "takeaway": "", "link": "https://m.thepaper.cn/detail/33846460", "source": "澎湃精选", "category": "society", "category_name": "社会与深度", "score": 93.1, "published": "2026-08-25T08:59:29+00:00", "ai": false}, {"title": "原中央纪委驻文化部纪检组组长张华林逝世，享年92岁", "summary": "原中央纪委驻文化部纪检组组长、原文化部党组成员张华林同志，因病于2026年8月7日在北京逝世，享年92岁。 张华林同志病重期间和逝世后，中央有关领导同志以不同方式表示慰问和哀悼。 张华林，1934年9月生，天津人。1953年8月参加工作，1959年5月加入中国共产党。1953年8月起任中国人民建设银行北京分行西四支行办事员、国务院专家局科员、国务院秘书厅秘书等。1969年4月至1972年5月下放国务院直属口“五七”干校劳动。1972年5月至1986年12月先后任国务院办公厅信访局科员、副处长、处长、副局长、局长。1986年12月至1991年1月先后任国务院办公厅人事局局长，国务院办公厅人事局局长、机关党委副书记，国务院办公厅人事司司长、机关党委书记。1991年1月至1993年10月任国务院机关党组成员、国务院办公厅机关党委书记。1993年10月至2000年8月先后任中央纪委驻文化部纪检组组", "points": ["原中央纪委驻文化部纪检组组长、原文化部党组成员张华林同志，因病于2026年8月7日在北京逝世，享年92岁。 张华林同志病重期间和逝世后，中央有关领导同志以不同方式表示慰问和哀悼。 张华林，1934年9月生，天津人。1953年8月参加工作，1959年5月加入中国共产党。1953年8月起任中国人民建设银行北京分行西四支行办事员、国务院专家局科员、国务院秘书厅秘书等。1969年4月至1972年5月下放国务院直属口“五七”干校劳动。1972年5月至1986年12月先后任国务院办公厅信…"], "takeaway": "", "link": "https://m.thepaper.cn/detail/33846404", "source": "澎湃时事", "category": "world", "category_name": "时事与国际", "score": 92.8, "published": "2026-08-25T08:36:26+00:00", "ai": false}, {"title": "郑莉任贵州省委常委、贵阳市委书记", "summary": "中国经济网贵阳8月25日综合报道 据贵阳网报道，8月24日，贵州省委常委、市委书记、贵安新区党工委书记郑莉看望慰问老同志。 上述报道显示，郑莉已任贵州省委常委、贵阳市委书记、贵安新区党工委书记。 <img src=\" width=\"536\" data-uploadpic=\"U020260825503190228140.jpg\" needdownload=\"true\" data-nee...", "points": ["中国经济网贵阳8月25日综合报道 据贵阳网报道，8月24日，贵州省委常委、市委书记、贵安新区党工委书记郑莉看望慰问老同志。 上述报道显示，郑莉已任贵州省委常委、贵阳市委书记、贵安新区党工委书记。 <img src=\" width=\"536\" data-uploadpic=\"U020260825503190228140.jpg\" needdownload=\"true\" data-nee..."], "takeaway": "", "link": "http://www.eeo.com.cn/2026/0825/1010773.shtml", "source": "经济观察网", "category": "finance", "category_name": "财经与商业", "score": 92.6, "published": "2026-08-25T09:13:11+00:00", "ai": false}, {"title": "为什么婚后2~3年，是离婚高峰？而不是“七年之痒”？", "summary": "本文转载自微信公众号： 好奇博士（ID：haoqi238） 参考文献 [1] Lavner JA, Bradbury T N. Patterns of change in marital satis-faction over the newlywed years[J]. Journal of Marriage andFamily, 2010,72(5):1171-1187. [2]徐安琪，叶文振。家庭生命周期和夫妻冲突的经验研究[J].中国人口科学，2002 (3):41-49. [3] He, D., Zhang, X.Y., Zhuang, Y. E., Wang, Z. L., &amp; Jiang, Y.(2019). China fertility report, 2006-2016: An analysis based onChina fertility survey 201", "points": ["本文转载自微信公众号： 好奇博士（ID：haoqi238） 参考文献 [1] Lavner JA, Bradbury T N. Patterns of change in marital satis-faction over the newlywed years[J]. Journal of Marriage andFamily, 2010,72(5):1171-1187. [2]徐安琪，叶文振。家庭生命周期和夫妻冲突的经验研究[J].中国人口科学，2002 (3):41-4…"], "takeaway": "", "link": "https://www.guokr.com/article/470022/", "source": "果壳科学人", "category": "science", "category_name": "科学与健康", "score": 92.5, "published": "2026-08-25T05:15:09+00:00", "ai": false}, {"title": "全总启动第二届班组长大赛，全国已有90万名班组职工报名", "summary": "据全国总工会8月25日消息，为全面加强企业班组建设，更好发挥产业工会作用，加快建设一支知识型、技能型、创新型产业工人大军，全国总工会办公厅近期印发了《关于举办第二届班组长大赛的通知》，全面启动大赛。 全总介绍，本届班组长大赛设置铁路、电力、医药、机械、冶金、建材、国防科技、信息通信、轻工、纺织等10个行业赛道，分网上报名及初赛、赛道决赛、成果交流三个阶段进行。企业班组成员可报名参加相应赛道初赛，班组长可晋级赛道决赛。各赛道决赛第1名且符合推荐条件的选手，按程序推荐申报全国五一劳动奖章。 全总表示，自8月10日大赛开放预报名以来，全国已有90万名班组职工报名，报名截止时间为9月5日24：00。自8月24日起，广大职工可登录“职工之家”APP，进入“劳动竞赛”模块“第二届班组长大赛”专区进行自主学习，参加网上练兵，获得学习证书。大赛初赛理论考试将于9月10日分时段在大赛专区进行，初赛成绩合格选", "points": ["据全国总工会8月25日消息，为全面加强企业班组建设，更好发挥产业工会作用，加快建设一支知识型、技能型、创新型产业工人大军，全国总工会办公厅近期印发了《关于举办第二届班组长大赛的通知》，全面启动大赛。 全总介绍，本届班组长大赛设置铁路、电力、医药、机械、冶金、建材、国防科技、信息通信、轻工、纺织等10个行业赛道，分网上报名及初赛、赛道决赛、成果交流三个阶段进行。企业班组成员可报名参加相应赛道初赛，班组长可晋级赛道决赛。各赛道决赛第1名且符合推荐条件的选手，按程序推荐申报全国五一…"], "takeaway": "", "link": "https://m.thepaper.cn/detail/33846011", "source": "澎湃时事", "category": "world", "category_name": "时事与国际", "score": 92.1, "published": "2026-08-25T07:25:08+00:00", "ai": false}, {"title": "最高时速160公里，京冀首条跨省域地铁空载试运行", "summary": "记者从北京市重大项目办和京投轨道公司获悉，京冀首条跨省域城市轨道交通北京地铁22号线（红庙站—平谷站）25日启动空载试运行，为2026年底基本开通奠定基础。 空载试运行将分两个阶段实施：第一阶段重点开展车辆、信号、通信等八大系统的综合联调与功能测试；第二阶段将开展“跑图”试运行，对列车正点率、运行图兑现率等关键指标进行验证，确保线路运行指标达到初期运营前安全评估标准。 北京地铁22号线（红庙站—平谷站）全长约79.1公里，共设车站20座，线路串联北京CBD核心区、北京城市副中心、河北三河市燕郊镇、北京平谷中心城等重点功能区。 线路速度优势明显，高架段最高时速达160公里，地下段达120公里。从河北三河市燕郊镇到北京城市副中心最快约9分钟、到北京CBD核心区红庙站最快约28分钟。 作为“轨道上的京津冀”标志性项目，线路建成后也将历史性实现河北三河市与北京城市轨道交通网的“无缝衔接”，进一步推", "points": ["记者从北京市重大项目办和京投轨道公司获悉，京冀首条跨省域城市轨道交通北京地铁22号线（红庙站—平谷站）25日启动空载试运行，为2026年底基本开通奠定基础。 空载试运行将分两个阶段实施：第一阶段重点开展车辆、信号、通信等八大系统的综合联调与功能测试；第二阶段将开展“跑图”试运行，对列车正点率、运行图兑现率等关键指标进行验证，确保线路运行指标达到初期运营前安全评估标准。 北京地铁22号线（红庙站—平谷站）全长约79.1公里，共设车站20座，线路串联北京CBD核心区、北京城市副中…"], "takeaway": "", "link": "https://m.thepaper.cn/detail/33845967", "source": "澎湃时事", "category": "world", "category_name": "时事与国际", "score": 91.8, "published": "2026-08-25T07:01:39+00:00", "ai": false}, {"title": "陶韵筑匠心 广西北流上演陶艺争锋", "summary": "图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄", "points": ["图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者 黄艳梅 摄 图为比赛现场。中新网记者…"], "takeaway": "", "link": "https://www.chinanews.com.cn/tp/2026/08-25/10683945.shtml", "source": "中新滚动", "category": "society", "category_name": "社会与深度", "score": 91.3, "published": "2026-08-25T08:53:10+00:00", "ai": false}, {"title": "纪念鲁迅诞辰145周年 “鲁迅文学周”在上海启幕", "summary": "图为读者在鲁迅先生墓前缅怀。中新社记者 张亨伟 摄 图为鲁迅长孙周令飞向鲁迅先生墓敬献鲜花。中新社记者 张亨伟 摄 图为鲁迅长孙周令飞接受媒体采访。中新社记者 张亨伟 摄 图为鲁迅长孙周令飞(右)向鲁迅先生墓敬献鲜花。中新社记者 张亨伟 摄 图为鲁迅相关的文创产品吸引读者驻足挑选。中新社记者 张亨伟 摄 图为“鲁迅文学周”在上海鲁迅公园开幕。中新社记者 张亨伟 摄", "points": ["图为读者在鲁迅先生墓前缅怀。中新社记者 张亨伟 摄 图为鲁迅长孙周令飞向鲁迅先生墓敬献鲜花。中新社记者 张亨伟 摄 图为鲁迅长孙周令飞接受媒体采访。中新社记者 张亨伟 摄 图为鲁迅长孙周令飞(右)向鲁迅先生墓敬献鲜花。中新社记者 张亨伟 摄 图为鲁迅相关的文创产品吸引读者驻足挑选。中新社记者 张亨伟 摄 图为“鲁迅文学周”在上海鲁迅公园开幕。中新社记者 张亨伟 摄"], "takeaway": "", "link": "https://www.chinanews.com.cn/tp/2026/08-25/10683908.shtml", "source": "中新滚动", "category": "society", "category_name": "社会与深度", "score": 91.2, "published": "2026-08-25T08:51:40+00:00", "ai": false}, {"title": "2026年上半年德国财政赤字增至713亿欧元", "summary": "中新网柏林8月25日电(记者 马秀秀)根据德国联邦统计局25日发布的初步数据，2026年上半年，德国财政赤字增至713亿欧元，较去年同期增加366亿欧元。按照国内生产总值计算，2026年上半年赤字率为3.1%。", "points": ["中新网柏林8月25日电(记者 马秀秀)根据德国联邦统计局25日发布的初步数据，2026年上半年，德国财政赤字增至713亿欧元，较去年同期增加366亿欧元。按照国内生产总值计算，2026年上半年赤字率为3.1%。"], "takeaway": "", "link": "https://www.chinanews.com.cn/gj/2026/08-25/10683928.shtml", "source": "中新国际", "category": "world", "category_name": "时事与国际", "score": 88.5, "published": "2026-08-25T08:42:51+00:00", "ai": false}, {"title": "处暑防温燥 药膳巧安排", "summary": "处暑节气的到来，意味着炎热的夏天即将结束，暑气开始消退，天气逐渐向凉爽的秋天过渡。立秋以后，燥气当令，暑热余威尚存，燥气与热邪相加，很容易让人患上“温燥”，出现嗓子干、咳嗽、上火等症状，也就是民间常说的“秋老虎咬人”。针对这个时节的气候特点，推荐几款药膳茶饮供大家选择使用。", "points": ["处暑节气的到来，意味着炎热的夏天即将结束，暑气开始消退，天气逐渐向凉爽的秋天过渡。立秋以后，燥气当令，暑热余威尚存，燥气与热邪相加，很容易让人患上“温燥”，出现嗓子干、咳嗽、上火等症状，也就是民间常说的“秋老虎咬人”。针对这个时节的气候特点，推荐几款药膳茶饮供大家选择使用。"], "takeaway": "", "link": "https://www.chinanews.com.cn/jk/2026/08-25/10683800.shtml", "source": "中新健康", "category": "science", "category_name": "科学与健康", "score": 88.5, "published": "2026-08-25T05:39:38+00:00", "ai": false}, {"title": "霍尔木兹海峡通行数量降至新低 美国称不排除武力打击", "summary": "中新社北京8月25日电 综合消息：船舶追踪机构克普勒公司最新数据显示，当地时间24日通过霍尔木兹海峡的商船数量降至3个多月以来最低水平。美国国防部长赫格塞思当天称，不排除在霍尔木兹海峡或伊朗周边地区动用武力的可能。", "points": ["中新社北京8月25日电 综合消息：船舶追踪机构克普勒公司最新数据显示，当地时间24日通过霍尔木兹海峡的商船数量降至3个多月以来最低水平。美国国防部长赫格塞思当天称，不排除在霍尔木兹海峡或伊朗周边地区动用武力的可能。"], "takeaway": "", "link": "https://www.chinanews.com.cn/gj/2026/08-25/10683873.shtml", "source": "中新国际", "category": "world", "category_name": "时事与国际", "score": 88.2, "published": "2026-08-25T07:57:22+00:00", "ai": false}, {"title": "看到这种“巨型蒲公英”，别吹别摘！吹一口可能罚100元！", "summary": "今年初夏，在北京、山东和辽宁等北方省市出现了大量“巨型蒲公英”，这些蒲公英的“毛球”比拳头还大，许多人玩得不亦乐乎，甚至专程“拍照打卡”。 巨型蒲公英丨小红书 但很多公园管理部门发出提醒： 这种“巨型蒲公英”虽然颜值很高，但最好只看不动——别吹、别摘，更不要随意带回家（根据《北京市公园条例》，采挖植物属于公园内禁止行为，违规可处50元以上100元以下罚款）。 北京某公园成片生长的“巨型蒲公英”丨参考文献[1] 很多人问：它们不就是“升级版”的蒲公英吗？吹散种子不是在帮它们繁殖吗？为什么不让吹？ 真假蒲公英 细看一下，我们不难发现，除了有着酷似蒲公英的毛球状果序，所谓的“巨型蒲公英”与真正的蒲公英（蒲公英属Taraxacum）气质迥异。 经相关学者鉴定，它的 真实身份是长喙婆罗门参（Tragopogon dubius）， 与蒲公英都是菊科（Asteraceae）莴苣族（Lactucinae）", "points": ["今年初夏，在北京、山东和辽宁等北方省市出现了大量“巨型蒲公英”，这些蒲公英的“毛球”比拳头还大，许多人玩得不亦乐乎，甚至专程“拍照打卡”。 巨型蒲公英丨小红书 但很多公园管理部门发出提醒： 这种“巨型蒲公英”虽然颜值很高，但最好只看不动——别吹、别摘，更不要随意带回家（根据《北京市公园条例》，采挖植物属于公园内禁止行为，违规可处50元以上100元以下罚款）。 北京某公园成片生长的“巨型蒲公英”丨参考文献[1] 很多人问：它们不就是“升级版”的蒲公英吗？吹散种子不是在帮它们繁殖…"], "takeaway": "", "link": "https://www.guokr.com/article/470018/", "source": "果壳科学人", "category": "science", "category_name": "科学与健康", "score": 87.5, "published": "2026-08-24T21:15:12+00:00", "ai": false}, {"title": "医疗保障法草案三审 对特困人员等参加城乡居民基本医保给予资助", "summary": "中新网北京8月25日电 (记者 郭超凯)医疗保障法草案25日提请十四届全国人大常委会三次审议。草案三审稿增加规定，特困人员、最低生活保障家庭成员、符合条件的防止返贫致贫对象等参加城乡居民基本医疗保险的，其个人缴费部分按照规定给予资助。", "points": ["中新网北京8月25日电 (记者 郭超凯)医疗保障法草案25日提请十四届全国人大常委会三次审议。草案三审稿增加规定，特困人员、最低生活保障家庭成员、符合条件的防止返贫致贫对象等参加城乡居民基本医疗保险的，其个人缴费部分按照规定给予资助。"], "takeaway": "", "link": "https://www.chinanews.com.cn/jk/2026/08-25/10683627.shtml", "source": "中新健康", "category": "science", "category_name": "科学与健康", "score": 84.2, "published": "2026-08-25T02:01:18+00:00", "ai": false}, {"title": "为人民出政绩 以实干出政绩——习近平总书记重要指示激励全党树立和践行正确政绩观不断创造高质量发展新业绩", "summary": "为人民出政绩 以实干出政绩——习近平总书记重要指示激励全党树立和践行正确政绩观不断创造高质量发展新业绩", "points": ["为人民出政绩 以实干出政绩——习近平总书记重要指示激励全党树立和践行正确政绩观不断创造高质量发展新业绩"], "takeaway": "", "link": "https://www.news.cn/politics/leaders/20260824/46fe6d8f3be04ecaad7365ebc0975503/c.html", "source": "澎湃文化", "category": "culture", "category_name": "文化与思想", "score": 80.1, "published": "2026-08-25T07:27:04+00:00", "ai": false}, {"title": "拾光纪·约旦国王第九次访华，习主席同他谈了这些大事", "summary": "拾光纪·约旦国王第九次访华，习主席同他谈了这些大事", "points": ["拾光纪·约旦国王第九次访华，习主席同他谈了这些大事"], "takeaway": "", "link": "https://www.peopleapp.com/column/30053004779-500007665552", "source": "澎湃文化", "category": "culture", "category_name": "文化与思想", "score": 77.7, "published": "2026-08-25T07:26:40+00:00", "ai": false}, {"title": "牛来，关于成长——粗粝外壳下的温柔哲思", "summary": "《牛来》虽然表层制作粗粝，难掩内在肌理的细腻真诚。", "points": ["《牛来》虽然表层制作粗粝，难掩内在肌理的细腻真诚。"], "takeaway": "", "link": "https://movie.douban.com/review/17787595/", "source": "豆瓣影评", "category": "culture", "category_name": "文化与思想", "score": 75.5, "published": "2026-08-25T06:23:22+00:00", "ai": false}, {"title": "《花束般的恋爱》——我们相遇时其实就是分开时，我们拥有时就到了失去时。", "summary": "花束般的恋爱  评价: 推荐", "points": ["花束般的恋爱 评价: 推荐"], "takeaway": "", "link": "https://movie.douban.com/review/17787500/", "source": "豆瓣影评", "category": "culture", "category_name": "文化与思想", "score": 73.7, "published": "2026-08-25T05:05:51+00:00", "ai": false}, {"title": "《本质之书》译后记", "summary": "关于翻译", "points": ["关于翻译"], "takeaway": "", "link": "https://book.douban.com/review/17785112/", "source": "豆瓣书评", "category": "culture", "category_name": "文化与思想", "score": 57.4, "published": "2026-08-24T00:55:11+00:00", "ai": false}], "page_url": ""};
 
 const PALETTE = ["#3a6dd6","#1f9d8b","#c47a2c","#7a54c8","#c44f86","#4f8a36","#c79125"];
 const catColor = {};
@@ -264,15 +195,9 @@ function colorFor(id, i){ if(!(id in catColor)) catColor[id]=PALETTE[i%PALETTE.l
 let DATA = null;
 let EMBEDDED = DIGEST;          // 内联的“今天”数据
 let viewedDate = DIGEST ? DIGEST.date : null;
-let hidden = loadHidden();
 let activeCat = "all";
-let query = "";
 let availDates = [];            // 归档可用日期（来自 archive/index.json）
 
-function loadHidden(){
-  try{ return JSON.parse(localStorage.getItem("np_hidden")||"{}"); }catch(e){ return {}; }
-}
-function saveHidden(){ localStorage.setItem("np_hidden", JSON.stringify(hidden)); }
 function esc(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function todayStr(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
 function shiftDate(n){ const d=new Date(); d.setDate(d.getDate()-n); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
@@ -294,16 +219,14 @@ function render(){
   // 日头部
   let head = `<div class="dayhead"><span class="d">${esc(isToday(DATA.date)?"今日资讯":fmtDate(DATA.date))}</span>`+
              `<span class="m">共 ${DATA.total} 条 · 覆盖 ${cats.length} 个领域${DATA.items[0]&&DATA.items[0].ai?" · AI 摘要":""}</span></div>`;
-  // 列表过滤
-  let items=(DATA.items||[]).filter(it=>!hidden[it.category]);
+  // 列表过滤（按底部选中的分类）
+  let items=(DATA.items||[]);
   if(activeCat!=="all") items=items.filter(it=>it.category===activeCat);
-  if(query){ const q=query.toLowerCase();
-    items=items.filter(it=>(it.title+" "+(it.takeaway||"")+" "+(it.source||"")+" "+(it.summary||"")).toLowerCase().includes(q)); }
   const list=document.getElementById("list");
   document.getElementById("empty").hidden = !(items.length===0);
   if(items.length===0){
-    document.getElementById("emptyTitle").textContent = query? "没有匹配结果" : "该日暂无内容";
-    document.getElementById("emptyMsg").textContent = query? "换个关键词试试。" : "这一天的归档里没有符合条件的条目。";
+    document.getElementById("emptyTitle").textContent = activeCat!=="all" ? "该分类暂无内容" : "该日暂无内容";
+    document.getElementById("emptyMsg").textContent = activeCat!=="all" ? "切换其他分类或选择“全部”看看。" : "这一天的归档里没有符合条件的条目。";
     list.innerHTML = head; return;
   }
   let html = head;
@@ -339,16 +262,6 @@ const styleCard=document.createElement("style");
 styleCard.textContent="@keyframes cardin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}";
 document.head.appendChild(styleCard);
 
-function renderToggles(){
-  const box=document.getElementById("toggles"); box.innerHTML="";
-  (DATA?.categories||EMBEDDED?.categories||[]).forEach(c=>{
-    const row=document.createElement("div"); row.className="toggle-row";
-    row.innerHTML=`<div class="name">${esc(c.name)}</div>`;
-    const sw=document.createElement("div"); sw.className="sw"+(!hidden[c.id]?" on":"");
-    sw.onclick=()=>{ hidden[c.id]=!hidden[c.id]; saveHidden(); sw.className="sw"+(!hidden[c.id]?" on":""); render(); };
-    row.appendChild(sw); box.appendChild(row);
-  });
-}
 
 /* —— 加载某日（今天用内联，往日抓 archive） —— */
 async function loadDate(dateStr){
@@ -361,22 +274,6 @@ async function loadDate(dateStr){
   DATA={date:dateStr,total:0,categories:[],items:[]}; render();
 }
 
-/* —— 领域抽屉 —— */
-function openCatSheet(){
-  const list=document.getElementById("catList"); list.innerHTML="";
-  const cats=(DATA||EMBEDDED||{}).categories||[];
-  const mk=(name,key,col,cnt)=>{
-    const row=document.createElement("div"); row.className="catrow"+(activeCat===key?" on":"");
-    row.innerHTML=`<span class="dotc" style="background:${col}"></span><span class="nm">${esc(name)}</span>`+
-      (cnt!=null?`<span class="cnt">${cnt}</span>`:"")+
-      `<svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>`;
-    row.onclick=()=>{ activeCat=key; closeSheet("cat"); render(); };
-    list.appendChild(row);
-  };
-  mk("全部","all","#9aa3b0",null);
-  cats.forEach((c,i)=>mk(c.name,c.id,colorFor(c.id,i),c.count));
-  openSheet("cat");
-}
 
 /* —— 抽屉通用 —— */
 function openSheet(which){
@@ -388,17 +285,31 @@ function closeSheet(which){
   document.getElementById(which+"Sheet").classList.remove("show");
 }
 
-/* —— 底部标签 —— */
-function setTab(tab){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on", t.dataset.tab===tab));
-  const sb=document.getElementById("searchbar");
-  if(tab==="search"){ sb.classList.add("show"); setTimeout(()=>document.getElementById("search").focus(),60); }
-  else { sb.classList.remove("show"); if(tab!=="search"){ /* 保留 query，仅收起框 */ } }
-  if(tab==="cat") openCatSheet();
-  if(tab==="settings"){ document.getElementById("mask").style.display="block"; document.getElementById("drawer").style.display="block"; }
+/* —— 底部导航：全部 + 具体分类（横向滚动胶囊） —— */
+function renderTabbar(){
+  const bar=document.getElementById("tabbar"); bar.innerHTML="";
+  const cats=(DATA||EMBEDDED||{}).categories||[];
+  const mk=(label,key,dotColor)=>{
+    const b=document.createElement("button"); b.className="tab"+(activeCat===key?" on":"");
+    b.dataset.cat=key;
+    const dot=dotColor?`<span class="dotc" style="background:${dotColor}"></span>`:"";
+    const icon=!dotColor?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>`:"";
+    b.innerHTML=`${icon}${dot}<span class="lab">${esc(label)}</span>`;
+    b.onclick=()=>setCat(key);
+    bar.appendChild(b);
+  };
+  mk("全部","all",null);
+  cats.forEach((c,i)=>mk(c.name,c.id,colorFor(c.id,i)));
+  const on=bar.querySelector(".tab.on");
+  if(on) on.scrollIntoView({inline:"center",block:"nearest"});
+}
+function setCat(key){
+  activeCat=key;
+  document.querySelectorAll("#tabbar .tab").forEach(t=>t.classList.toggle("on",t.dataset.cat===key));
+  render();
 }
 document.getElementById("tabbar").addEventListener("click",e=>{
-  const b=e.target.closest(".tab"); if(!b) return; setTab(b.dataset.tab);
+  const b=e.target.closest(".tab"); if(!b) return; setCat(b.dataset.cat);
 });
 
 /* —— 日期抽屉 —— */
@@ -425,15 +336,9 @@ document.getElementById("dateGo").onclick=()=>{
   const v=document.getElementById("dateInput").value; if(!v) return;
   closeSheet("date"); loadDate(v);
 };
-["dateMask","catMask"].forEach(id=>document.getElementById(id).onclick=()=>{
-  const which=id.replace("Mask",""); closeSheet(which);
-});
-document.getElementById("mask").onclick=()=>{
-  document.getElementById("mask").style.display="none"; document.getElementById("drawer").style.display="none";
-};
+document.getElementById("dateMask").onclick=()=>closeSheet("date");
 
-/* —— 搜索 / 刷新 —— */
-document.getElementById("search").addEventListener("input",e=>{query=e.target.value;render();});
+/* —— 刷新 —— */
 document.getElementById("refreshBtn").onclick=()=>{
   if(EMBEDDED && viewedDate===EMBEDDED.date){ location.reload(); }
   else { loadDate(EMBEDDED?EMBEDDED.date:viewedDate); }
@@ -441,7 +346,7 @@ document.getElementById("refreshBtn").onclick=()=>{
 
 /* —— 启动 —— */
 async function boot(){
-  if(DIGEST){ DATA=DIGEST; render(); renderToggles(); }
+  if(DIGEST){ DATA=DIGEST; render(); renderTabbar(); }
   // 拉取可用归档日期（用于日期输入范围与回看）
   try{
     const r=await fetch("archive/index.json",{cache:"no-store"});
@@ -450,7 +355,7 @@ async function boot(){
   if(!DIGEST){
     try{
       const r=await fetch("../data/latest.json",{cache:"no-store"});
-      if(r.ok){ EMBEDDED=DATA=await r.json(); render(); renderToggles(); return; }
+      if(r.ok){ EMBEDDED=DATA=await r.json(); render(); renderTabbar(); return; }
     }catch(e){}
     document.getElementById("emptyTitle").textContent="无数据";
     document.getElementById("emptyMsg").textContent="请先运行生成，或访问最新 data/latest.html。";

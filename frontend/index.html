@@ -51,15 +51,6 @@
   }
   .iconbtn:active{background:var(--primary-soft)}
 
-  /* 搜索条（仅在“搜索”标签激活时展开） */
-  .searchbar{display:none;padding:0 0 var(--s2);overflow:hidden}
-  .searchbar.show{display:block;animation:drop .22s cubic-bezier(.2,.7,.2,1)}
-  .search{
-    width:100%;height:44px;border:1px solid var(--line);border-radius:12px;
-    padding:0 14px;font-size:16px;background:var(--card);color:var(--ink);outline:none;
-  }
-  .search:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
-
   /* —— 列表 —— */
   .list{margin:var(--s4) 0 var(--s2)}
   .dayhead{display:flex;align-items:baseline;gap:var(--s2);margin:var(--s4) 2px var(--s2)}
@@ -91,23 +82,26 @@
   .empty code{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:13px}
   footer{text-align:center;color:var(--sub-2);font-size:12px;padding:var(--s4) 0 calc(var(--s4) + 4px)}
 
-  /* —— 底部导航 —— */
+  /* —— 底部导航（全部 + 具体分类，横向滚动胶囊） —— */
   nav.tabbar{
     position:fixed;left:0;right:0;bottom:0;z-index:30;
     background:rgba(255,255,255,.94);backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px);
     border-top:1px solid var(--line);
-    padding-bottom:var(--safe);
-    display:flex;
+    padding:8px 12px calc(8px + var(--safe));
+    display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;
   }
+  nav.tabbar::-webkit-scrollbar{display:none}
   .tab{
-    flex:1;min-width:0;background:none;border:none;cursor:pointer;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-    height:56px;color:var(--sub);padding:6px 2px 0;
+    flex:none;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:999px;
+    cursor:pointer;display:flex;align-items:center;gap:6px;height:40px;padding:0 14px;color:var(--sub);
+    font-size:14px;font-weight:600;white-space:nowrap;
+    transition:background .15s,color .15s,border-color .15s;
   }
-  .tab svg{width:23px;height:23px}
-  .tab .lab{font-size:11px;font-weight:600;line-height:1}
-  .tab.on{color:var(--primary)}
-  .tab.on svg{stroke-width:2.2}
+  .tab svg{width:17px;height:17px;flex:none}
+  .tab .dotc{width:8px;height:8px;border-radius:50%;flex:none}
+  .tab .lab{line-height:1}
+  .tab.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .tab.on .dotc{box-shadow:0 0 0 2px rgba(255,255,255,.55)}
   .tab:active{background:var(--primary-soft)}
 
   /* —— 底部抽屉（日期 / 领域） —— */
@@ -137,32 +131,7 @@
     color:#fff;font-size:15.5px;font-weight:700;cursor:pointer;
   }
   .primary-btn:active{filter:brightness(.95)}
-  /* 领域列表 */
-  .catrow{
-    display:flex;align-items:center;gap:var(--s3);padding:14px 4px;border-bottom:1px solid var(--line);cursor:pointer;
-  }
-  .catrow:last-child{border-bottom:none}
-  .catrow .dotc{width:10px;height:10px;border-radius:50%;flex:none}
-  .catrow .nm{font-size:15.5px;font-weight:600;flex:1}
-  .catrow .cnt{font-size:13px;color:var(--sub);font-variant-numeric:tabular-nums}
-  .catrow .tick{width:20px;height:20px;color:var(--primary);opacity:0;flex:none}
-  .catrow.on .tick{opacity:1}
-  .catrow.on .nm{color:var(--primary)}
 
-  /* 设置抽屉 */
-  .drawer-mask{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:40;display:none}
-  .drawer{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);
-    border-radius:18px 18px 0 0;padding:var(--s4) var(--s4) calc(var(--s5) + var(--safe));display:none;max-height:80vh;overflow:auto}
-  .drawer h3{margin:0 0 var(--s3);font-size:17px}
-  .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 2px;border-bottom:1px solid var(--line)}
-  .toggle-row .name{font-size:15px}
-  .sw{width:48px;height:28px;border-radius:999px;background:var(--line);position:relative;transition:.2s;flex:none}
-  .sw.on{background:var(--primary)}
-  .sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
-  .sw.on::after{left:23px}
-  .drawer .hint{color:var(--sub);font-size:13px;margin-top:var(--s3);line-height:1.6}
-
-  @keyframes drop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   /* 桌面端：底部导航收束为居中浮条，内容更宽留白 */
   @media (min-width:860px){
@@ -187,9 +156,6 @@
       </button>
     </div>
   </div>
-  <div class="wrap searchbar" id="searchbar">
-    <input class="search" id="search" type="search" placeholder="搜索标题 / 关键词 / 来源" />
-  </div>
 </header>
 
 <main class="wrap">
@@ -202,25 +168,8 @@
 
 <footer>NewsPulse · 多领域 · 有深度 · 每日 08:00 推送</footer>
 
-<!-- 底部导航 -->
-<nav class="tabbar" id="tabbar">
-  <button class="tab on" data-tab="all">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
-    <span class="lab">全部</span>
-  </button>
-  <button class="tab" data-tab="cat">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5 12 3l8.5 4.5L12 12 3.5 7.5Z"/><path d="M3.5 7.5V16l8.5 4.5V12M20.5 7.5V16L12 20.5"/><path d="m12 3 8.5 4.5"/></svg>
-    <span class="lab">领域</span>
-  </button>
-  <button class="tab" data-tab="search">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg>
-    <span class="lab">搜索</span>
-  </button>
-  <button class="tab" data-tab="settings">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .34 1.87l.05.05a2 2 0 1 1-2.83 2.83l-.05-.05a1.7 1.7 0 0 0-2.87 1.2V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-2.87-1.2l-.05.05a2 2 0 1 1-2.83-2.83l.05-.05a1.7 1.7 0 0 0-1.2-2.87H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.2-2.87l-.05-.05A2 2 0 1 1 6.2 3.6l.05.05a1.7 1.7 0 0 0 1.87.34H8a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 2.87 1.2l.05-.05a2 2 0 1 1 2.83 2.83l-.05.05a1.7 1.7 0 0 0-.34 1.87Z"/></svg>
-    <span class="lab">设置</span>
-  </button>
-</nav>
+<!-- 底部导航：全部 + 具体分类区块（由 JS 动态生成） -->
+<nav class="tabbar" id="tabbar"></nav>
 
 <!-- 日期选择抽屉 -->
 <div class="sheet-mask" id="dateMask"></div>
@@ -236,24 +185,6 @@
   <button class="primary-btn" id="dateGo">查看这一天</button>
 </div>
 
-<!-- 领域筛选抽屉 -->
-<div class="sheet-mask" id="catMask"></div>
-<div class="sheet" id="catSheet">
-  <div class="grab"></div>
-  <h3>按领域筛选</h3>
-  <p class="sub">选择一个领域只看该类资讯</p>
-  <div id="catList"></div>
-</div>
-
-<!-- 设置抽屉 -->
-<div class="drawer-mask" id="mask"></div>
-<div class="drawer" id="drawer">
-  <h3>显示设置（仅本机偏好）</h3>
-  <div id="toggles"></div>
-  <div class="hint">把本页「添加到主屏幕」即可像 App 一样在手机打开。<br/>
-  推送时间与内容领域请在项目 <code>config.yaml</code> 中配置后重新生成。</div>
-</div>
-
 <script>
 const DIGEST = /*__DIGEST_JSON__*/null;
 
@@ -264,15 +195,9 @@ function colorFor(id, i){ if(!(id in catColor)) catColor[id]=PALETTE[i%PALETTE.l
 let DATA = null;
 let EMBEDDED = DIGEST;          // 内联的“今天”数据
 let viewedDate = DIGEST ? DIGEST.date : null;
-let hidden = loadHidden();
 let activeCat = "all";
-let query = "";
 let availDates = [];            // 归档可用日期（来自 archive/index.json）
 
-function loadHidden(){
-  try{ return JSON.parse(localStorage.getItem("np_hidden")||"{}"); }catch(e){ return {}; }
-}
-function saveHidden(){ localStorage.setItem("np_hidden", JSON.stringify(hidden)); }
 function esc(s){ return (s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function todayStr(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
 function shiftDate(n){ const d=new Date(); d.setDate(d.getDate()-n); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
@@ -294,16 +219,14 @@ function render(){
   // 日头部
   let head = `<div class="dayhead"><span class="d">${esc(isToday(DATA.date)?"今日资讯":fmtDate(DATA.date))}</span>`+
              `<span class="m">共 ${DATA.total} 条 · 覆盖 ${cats.length} 个领域${DATA.items[0]&&DATA.items[0].ai?" · AI 摘要":""}</span></div>`;
-  // 列表过滤
-  let items=(DATA.items||[]).filter(it=>!hidden[it.category]);
+  // 列表过滤（按底部选中的分类）
+  let items=(DATA.items||[]);
   if(activeCat!=="all") items=items.filter(it=>it.category===activeCat);
-  if(query){ const q=query.toLowerCase();
-    items=items.filter(it=>(it.title+" "+(it.takeaway||"")+" "+(it.source||"")+" "+(it.summary||"")).toLowerCase().includes(q)); }
   const list=document.getElementById("list");
   document.getElementById("empty").hidden = !(items.length===0);
   if(items.length===0){
-    document.getElementById("emptyTitle").textContent = query? "没有匹配结果" : "该日暂无内容";
-    document.getElementById("emptyMsg").textContent = query? "换个关键词试试。" : "这一天的归档里没有符合条件的条目。";
+    document.getElementById("emptyTitle").textContent = activeCat!=="all" ? "该分类暂无内容" : "该日暂无内容";
+    document.getElementById("emptyMsg").textContent = activeCat!=="all" ? "切换其他分类或选择“全部”看看。" : "这一天的归档里没有符合条件的条目。";
     list.innerHTML = head; return;
   }
   let html = head;
@@ -339,16 +262,6 @@ const styleCard=document.createElement("style");
 styleCard.textContent="@keyframes cardin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}";
 document.head.appendChild(styleCard);
 
-function renderToggles(){
-  const box=document.getElementById("toggles"); box.innerHTML="";
-  (DATA?.categories||EMBEDDED?.categories||[]).forEach(c=>{
-    const row=document.createElement("div"); row.className="toggle-row";
-    row.innerHTML=`<div class="name">${esc(c.name)}</div>`;
-    const sw=document.createElement("div"); sw.className="sw"+(!hidden[c.id]?" on":"");
-    sw.onclick=()=>{ hidden[c.id]=!hidden[c.id]; saveHidden(); sw.className="sw"+(!hidden[c.id]?" on":""); render(); };
-    row.appendChild(sw); box.appendChild(row);
-  });
-}
 
 /* —— 加载某日（今天用内联，往日抓 archive） —— */
 async function loadDate(dateStr){
@@ -361,22 +274,6 @@ async function loadDate(dateStr){
   DATA={date:dateStr,total:0,categories:[],items:[]}; render();
 }
 
-/* —— 领域抽屉 —— */
-function openCatSheet(){
-  const list=document.getElementById("catList"); list.innerHTML="";
-  const cats=(DATA||EMBEDDED||{}).categories||[];
-  const mk=(name,key,col,cnt)=>{
-    const row=document.createElement("div"); row.className="catrow"+(activeCat===key?" on":"");
-    row.innerHTML=`<span class="dotc" style="background:${col}"></span><span class="nm">${esc(name)}</span>`+
-      (cnt!=null?`<span class="cnt">${cnt}</span>`:"")+
-      `<svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>`;
-    row.onclick=()=>{ activeCat=key; closeSheet("cat"); render(); };
-    list.appendChild(row);
-  };
-  mk("全部","all","#9aa3b0",null);
-  cats.forEach((c,i)=>mk(c.name,c.id,colorFor(c.id,i),c.count));
-  openSheet("cat");
-}
 
 /* —— 抽屉通用 —— */
 function openSheet(which){
@@ -388,17 +285,31 @@ function closeSheet(which){
   document.getElementById(which+"Sheet").classList.remove("show");
 }
 
-/* —— 底部标签 —— */
-function setTab(tab){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on", t.dataset.tab===tab));
-  const sb=document.getElementById("searchbar");
-  if(tab==="search"){ sb.classList.add("show"); setTimeout(()=>document.getElementById("search").focus(),60); }
-  else { sb.classList.remove("show"); if(tab!=="search"){ /* 保留 query，仅收起框 */ } }
-  if(tab==="cat") openCatSheet();
-  if(tab==="settings"){ document.getElementById("mask").style.display="block"; document.getElementById("drawer").style.display="block"; }
+/* —— 底部导航：全部 + 具体分类（横向滚动胶囊） —— */
+function renderTabbar(){
+  const bar=document.getElementById("tabbar"); bar.innerHTML="";
+  const cats=(DATA||EMBEDDED||{}).categories||[];
+  const mk=(label,key,dotColor)=>{
+    const b=document.createElement("button"); b.className="tab"+(activeCat===key?" on":"");
+    b.dataset.cat=key;
+    const dot=dotColor?`<span class="dotc" style="background:${dotColor}"></span>`:"";
+    const icon=!dotColor?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>`:"";
+    b.innerHTML=`${icon}${dot}<span class="lab">${esc(label)}</span>`;
+    b.onclick=()=>setCat(key);
+    bar.appendChild(b);
+  };
+  mk("全部","all",null);
+  cats.forEach((c,i)=>mk(c.name,c.id,colorFor(c.id,i)));
+  const on=bar.querySelector(".tab.on");
+  if(on) on.scrollIntoView({inline:"center",block:"nearest"});
+}
+function setCat(key){
+  activeCat=key;
+  document.querySelectorAll("#tabbar .tab").forEach(t=>t.classList.toggle("on",t.dataset.cat===key));
+  render();
 }
 document.getElementById("tabbar").addEventListener("click",e=>{
-  const b=e.target.closest(".tab"); if(!b) return; setTab(b.dataset.tab);
+  const b=e.target.closest(".tab"); if(!b) return; setCat(b.dataset.cat);
 });
 
 /* —— 日期抽屉 —— */
@@ -425,15 +336,9 @@ document.getElementById("dateGo").onclick=()=>{
   const v=document.getElementById("dateInput").value; if(!v) return;
   closeSheet("date"); loadDate(v);
 };
-["dateMask","catMask"].forEach(id=>document.getElementById(id).onclick=()=>{
-  const which=id.replace("Mask",""); closeSheet(which);
-});
-document.getElementById("mask").onclick=()=>{
-  document.getElementById("mask").style.display="none"; document.getElementById("drawer").style.display="none";
-};
+document.getElementById("dateMask").onclick=()=>closeSheet("date");
 
-/* —— 搜索 / 刷新 —— */
-document.getElementById("search").addEventListener("input",e=>{query=e.target.value;render();});
+/* —— 刷新 —— */
 document.getElementById("refreshBtn").onclick=()=>{
   if(EMBEDDED && viewedDate===EMBEDDED.date){ location.reload(); }
   else { loadDate(EMBEDDED?EMBEDDED.date:viewedDate); }
@@ -441,7 +346,7 @@ document.getElementById("refreshBtn").onclick=()=>{
 
 /* —— 启动 —— */
 async function boot(){
-  if(DIGEST){ DATA=DIGEST; render(); renderToggles(); }
+  if(DIGEST){ DATA=DIGEST; render(); renderTabbar(); }
   // 拉取可用归档日期（用于日期输入范围与回看）
   try{
     const r=await fetch("archive/index.json",{cache:"no-store"});
@@ -450,7 +355,7 @@ async function boot(){
   if(!DIGEST){
     try{
       const r=await fetch("../data/latest.json",{cache:"no-store"});
-      if(r.ok){ EMBEDDED=DATA=await r.json(); render(); renderToggles(); return; }
+      if(r.ok){ EMBEDDED=DATA=await r.json(); render(); renderTabbar(); return; }
     }catch(e){}
     document.getElementById("emptyTitle").textContent="无数据";
     document.getElementById("emptyMsg").textContent="请先运行生成，或访问最新 data/latest.html。";
