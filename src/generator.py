@@ -4,6 +4,7 @@
 - latest.html：移动端阅读页，数据内联，离线/直接打开均可用
 模板来源 frontend/index.html（单一模板，注入 __DIGEST_JSON__ 占位符）
 """
+import hashlib
 import json
 import logging
 import os
@@ -15,6 +16,15 @@ TEMPLATE = os.path.join(ROOT, "frontend", "index.html")
 PLACEHOLDER = "/*__DIGEST_JSON__*/null"
 
 
+def _item_id(source: str, title: str) -> str:
+    """稳定唯一标识：来源+标题的 MD5 前 12 位。
+
+    列表页 → 详情页的数据传递键：前端详情视图据 id 从
+    当前数据源（内联 today / archive/<日期>.json）中按 id 查找完整对象。
+    """
+    return hashlib.md5(f"{source}|{title}".encode("utf-8")).hexdigest()[:12]
+
+
 def build_digest(items: list[dict], categories_cfg: list[dict] | None = None) -> dict:
     cats: dict[str, dict] = {}
     out = []
@@ -24,8 +34,10 @@ def build_digest(items: list[dict], categories_cfg: list[dict] | None = None) ->
         cats[cid]["count"] += 1
         out.append(
             {
+                "id": _item_id(it.get("_source_name", ""), it.get("title", "")),
                 "title": it.get("title", ""),
-                "summary": it.get("summary", "")[:400],
+                "summary": it.get("summary", "")[:400],   # 列表页：精简摘要
+                "content": it.get("summary", ""),         # 详情页：完整原文内容（不截断）
                 "points": it.get("points", []),
                 "takeaway": it.get("takeaway", ""),
                 "link": it.get("link", ""),
