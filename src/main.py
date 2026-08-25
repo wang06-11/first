@@ -15,6 +15,7 @@ import argparse
 import logging
 import os
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 from .config import NewsPulseConfig
@@ -24,13 +25,25 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def collect(cfg: NewsPulseConfig) -> list[dict]:
-    all_items: list[dict] = []
+    # 先组装所有待抓任务，再并行抓取，显著缩短多源聚合时间
+    tasks = []
     for cat in cfg.categories:
         cid = cat["id"]
         cname = cat.get("name", cid)
         auth = float(cat.get("authority", 1.0))
         for src in cat.get("sources", []):
-            raw = fetcher.fetch_feed(src["url"])
+            tasks.append((src, cid, cname, auth))
+
+    all_items: list[dict] = []
+    max_workers = min(10, max(1, len(tasks)))
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        future_to_meta = {
+            ex.submit(fetcher.fetch_feed, src["url"]): (src, cid, cname, auth)
+            for src, cid, cname, auth in tasks
+        }
+        for fut in as_completed(future_to_meta):
+            src, cid, cname, auth = future_to_meta[fut]
+            raw = fut.result()
             w = float(src.get("weight", 1.0))
             for it in raw:
                 it["_category"] = cid
@@ -39,8 +52,8 @@ def collect(cfg: NewsPulseConfig) -> list[dict]:
                 it["_cat_authority"] = auth
                 it["_source_weight"] = w
                 all_items.append(it)
-    logging.info("[collect] 共抓取 %d 条原始条目（%d 个启用领域）",
-                 len(all_items), len(cfg.categories))
+    logging.info("[collect] 共抓取 %d 条原始条目（%d 个启用领域，%d 个源）",
+                 len(all_items), len(cfg.categories), len(tasks))
     return all_items
 
 
