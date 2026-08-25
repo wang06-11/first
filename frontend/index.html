@@ -142,6 +142,7 @@
   .navbtn.open .chev{transform:rotate(180deg);color:var(--primary)}
 
   /* —— 抽屉（标准 Modal Bottom Sheet：圆角顶部 + grab handle + 阴影 + 滑入） —— */
+  /* 收起态默认不可点击，避免 hit-test 干扰背后内容 */
   .sheet-mask{position:fixed;inset:0;background:rgba(15,23,42,.42);z-index:40;opacity:0;pointer-events:none;transition:opacity .22s}
   .sheet-mask.show{opacity:1;pointer-events:auto}
   .sheet{
@@ -150,8 +151,9 @@
     padding:8px var(--s4) calc(var(--s5) + var(--safe));
     transform:translateY(100%);transition:transform .28s cubic-bezier(.2,.8,.2,1);
     max-height:82vh;overflow:auto;box-shadow:var(--shadow-up);
+    pointer-events:none;
   }
-  .sheet.show{transform:translateY(0)}
+  .sheet.show{transform:translateY(0);pointer-events:auto}
   .grab{width:38px;height:4px;border-radius:999px;background:var(--line);margin:6px auto var(--s3);cursor:pointer}
   .sheet h3{margin:0 0 4px;font-size:17px;font-weight:800}
   .sheet .sub{color:var(--sub);font-size:13px;margin:0 0 var(--s3)}
@@ -459,7 +461,10 @@ function renderCatSheet(){
   const cats=currentCats();
   // 重建抽屉内容：grab handle + 标题 + 副标题 + 网格
   sheet.innerHTML="";
-  const grab=document.createElement("div"); grab.className="grab"; grab.onclick=()=>toggleNav(false);
+  // grab handle 改为 button + addEventListener + stopPropagation，避免误触拦截
+  const grab=document.createElement("button");
+  grab.type="button"; grab.className="grab"; grab.setAttribute("aria-label","关闭");
+  grab.addEventListener("click",(e)=>{ e.stopPropagation(); toggleNav(false); });
   const h3=document.createElement("h3"); h3.textContent="按领域筛选";
   const sub=document.createElement("p"); sub.className="sub"; sub.textContent="选择一个领域只看该类资讯（共 "+cats.length+" 个领域）";
   const grid=document.createElement("div"); grid.className="cat-grid";
@@ -467,19 +472,23 @@ function renderCatSheet(){
 
   const mkTile=(id, name, col, cnt, isAll)=>{
     const b=document.createElement("button");
+    b.type="button";
     b.className="cat-tile"+(state.activeCat===id?" on":"");
     b.dataset.cat=id;
     const mark = isAll
-      ? `<svg class="dotc" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa3b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>`
+      ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa3b0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>`
       : `<span class="dotc" style="background:${col}"></span>`;
     b.innerHTML=`${mark}<span class="nm">${esc(name)}</span>${cnt!=null?`<span class="cnt">${cnt}</span>`:""}
       <svg class="chk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg>`;
-    b.onclick=()=>{ setCat(id); toggleNav(false); };
+    // 用 addEventListener（更稳健；DOM 重建时不会被覆盖）
+    b.addEventListener("click",(e)=>onCatTileClick(id,e));
     grid.appendChild(b);
   };
   mkTile("all","全部","#9aa3b0",null,true);
   cats.forEach((c,i)=>mkTile(c.id, c.name, colorFor(c.id,i), c.count));
 }
+function setCat(key){ state.activeCat=key; render(); }
+function onCatTileClick(id, ev){ if(ev) ev.stopPropagation(); setCat(id); toggleNav(false); }
 function toggleNav(force){
   const open= force===undefined ? !state.navOpen : force;
   state.navOpen=open;
@@ -487,17 +496,22 @@ function toggleNav(force){
   document.getElementById("navBtn")?.setAttribute("aria-expanded", open?"true":"false");
   if(open) openSheet("cat"); else closeSheet("cat");
 }
-document.getElementById("catMask").onclick=()=>toggleNav(false);
+document.getElementById("catMask").addEventListener("click",()=>toggleNav(false));
 
 /* ================= 抽屉通用 ================= */
 function openSheet(which){
   document.getElementById(which+"Mask").classList.add("show");
   document.getElementById(which+"Sheet").classList.add("show");
+  // 锁住背景滚动，避免抽屉打开时背后内容被滑动穿透
+  document.body.style.overflow="hidden";
 }
 function closeSheet(which){
   document.getElementById(which+"Mask").classList.remove("show");
   document.getElementById(which+"Sheet").classList.remove("show");
   if(which==="cat"){ state.navOpen=false; document.getElementById("navBtn")?.classList.remove("open"); document.getElementById("navBtn")?.setAttribute("aria-expanded","false"); }
+  // 还原 body 滚动（仅当所有抽屉都已关闭时）
+  const anyOpen=document.querySelector(".sheet-mask.show");
+  if(!anyOpen) document.body.style.overflow="";
 }
 
 /* ================= 日期抽屉 ================= */
