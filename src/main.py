@@ -59,6 +59,9 @@ def collect(cfg: NewsPulseConfig) -> list[dict]:
 
 def run_once(cfg: NewsPulseConfig, page_url: str = "") -> dict:
     items = collect(cfg)
+    # 先按时效硬过滤，再去重：避免旧闻占用去重名额，
+    # 导致同一标题的新版本被误判为「已见过」。
+    items = scorer.filter_fresh(items, float(cfg.preferences.get("max_age_hours", 48)))
     items = dedup.deduplicate(items)
     for it in items:
         it["_score"] = scorer.score_item(

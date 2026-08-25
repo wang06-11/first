@@ -21,19 +21,45 @@ def _hours_ago(iso: str) -> float:
         return 24.0
 
 
+_CJK_RE = re.compile(r"[\u4e00-\u9fff]")
+
+
+def _is_chinese(text: str) -> bool:
+    """粗判是否中文文本（CJK 字符占比 > 20%）。"""
+    if not text:
+        return False
+    cjk = len(_CJK_RE.findall(text))
+    return cjk >= 8 or (cjk / max(1, len(text))) > 0.2
+
+
+def _depth_score(summary: str, title: str) -> float:
+    """深度分：按语言自适应阈值。
+
+    中文单字信息量远高于英文单字符：一条 160 字的中文摘要
+    ≈ 一条 400 字符的英文摘要。若统一用 400 阈值，中文条目
+    会被系统性误判为「没深度」。
+    """
+    length = len(summary or "")
+    threshold = 160.0 if _is_chinese(summary or title) else 400.0
+    return min(1.0, length / threshold)
+
+
 def score_item(item: dict, cat_authority: float, source_weight: float, prefs: dict) -> float:
     """返回 0-100 的单项质量分。"""
-    # 新鲜度：48h 内线性衰减
+    # 新鲜度：72h 内线性衰减
     age = _hours_ago(item.get("published", ""))
     fresh = max(0.0, 1.0 - age / 72.0)
+    # 源未提供发布时间时，抓取层回落为「当前时间」，会伪装成最新。
+    # 这里打对折，避免无时间戳的源霸占榜首。
+    if item.get("_no_date"):
+        fresh *= 0.5
 
-    # 深度：正文长度信号（RSS 常只给摘要，越长通常越有料）
-    length = len(item.get("summary", ""))
-    depth = min(1.0, length / 400.0)
+    title = item.get("title", "")
+    depth = _depth_score(item.get("summary", ""), title)
 
     # 用户偏好关键词加权
     boost = 0.0
-    text = (item.get("title", "") + " " + item.get("summary", "")).lower()
+    text = (title + " " + item.get("summary", "")).lower()
     for kw in prefs.get("keywords_boost", []) or []:
         if kw.lower() in text:
             boost += 0.15
@@ -42,6 +68,9 @@ def score_item(item: dict, cat_authority: float, source_weight: float, prefs: di
         if kw.lower() in text:
             block += 0.5
 
+    # 标题过短通常是图集/短视频/快讯占位，信息量低
+    short_title_penalty = 3.0 if len(title.strip()) < 8 else 0.0
+
     s = (
         45 * fresh
         + 20 * cat_authority
@@ -49,8 +78,47 @@ def score_item(item: dict, cat_authority: float, source_weight: float, prefs: di
         + 15 * depth
         + boost
         - block
+        - short_title_penalty
     )
     return max(0.0, min(100.0, s))
+
+
+def filter_fresh(items: list[dict], max_age_hours: float) -> list[dict]:
+    """硬过滤：剔除超过 max_age_hours 的条目。
+
+    部分中文门户 RSS 会返回上百条历史条目，若不过滤，
+    「每日新闻」会混入几个月前的旧闻。
+    """
+    if not max_age_hours or max_age_hours <= 0:
+        return items
+    kept = [it for it in items if _hours_ago(it.get("published", "")) <= max_age_hours]
+    dropped = len(items) - len(kept)
+    if dropped:
+        logging.info("[filter] 剔除 %d 条超过 %.0f 小时的旧闻，保留 %d 条",
+                     dropped, max_age_hours, len(kept))
+    return kept
+
+
+def _cap_per_source(sorted_items: list[dict], per_cat: int) -> list[dict]:
+    """限制单个来源在同一领域内的条目数，保证来源多样性。
+
+    配额 = max(2, ceil(per_category / 该领域源数))：
+    源多的领域每源少取（科技 8 源 -> 每源 2 条），
+    源少的领域适度放宽（国际 2 源 -> 每源 3 条），避免凑不满。
+    超额条目排到列表末尾作为备用，而非直接丢弃。
+    """
+    n_src = len({it.get("_source_name", "") for it in sorted_items}) or 1
+    quota = max(2, math.ceil(per_cat / n_src))
+    used: dict[str, int] = {}
+    primary, overflow = [], []
+    for it in sorted_items:
+        src = it.get("_source_name", "")
+        if used.get(src, 0) < quota:
+            used[src] = used.get(src, 0) + 1
+            primary.append(it)
+        else:
+            overflow.append(it)
+    return primary + overflow
 
 
 def select(items_with_meta: list[dict], prefs: dict) -> list[dict]:
@@ -71,6 +139,10 @@ def select(items_with_meta: list[dict], prefs: dict) -> list[dict]:
 
     for cat in by_cat:
         by_cat[cat].sort(key=lambda x: x["_score"], reverse=True)
+
+    # 同源配额：防止单一媒体霸占整个领域（如豆瓣影评占满「文化」）。
+    # 配额随领域内源数量动态调整，源多则每源少取，源少则放宽。
+    by_cat = {cat: _cap_per_source(lst, per_cat) for cat, lst in by_cat.items()}
 
     # 先每领域取 Top per_cat
     chosen: list[dict] = []

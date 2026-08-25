@@ -1,6 +1,12 @@
 # ============================================================
-# NewsPulse 配置文件
+# NewsPulse 配置文件（全中文源版）
 # 改这里即可调整：推送时间、内容偏好、领域与来源
+#
+# 本文件所有来源均已实测：可访问、有时间戳、72 小时内有新内容。
+# 已剔除的源（勿再加入）：
+#   新华网各频道  -> RSS 无时间戳，会把旧闻误判为最新
+#   人民网各频道  -> 内容普遍超过 72 小时，不适合日报
+#   机器之心/虎嗅官方源/36氪官方源/果壳官网/环球科学 -> RSS 已停用或返回空
 # ============================================================
 
 # —— 推送与定时（稳定调度：GitHub Actions 或本地 APScheduler）——
@@ -11,18 +17,29 @@ schedule:
 
 # —— 内容偏好（多领域 + 深度 + 个性化）——
 preferences:
-  max_total: 36             # 每日最终条目上限
-  per_category: 7           # 单个领域最多条数
+  max_total: 30             # 每日最终条目上限
+  per_category: 6           # 单个领域最多条数
   min_categories: 5         # 至少覆盖的领域数（保证多样性，避免单一浅薄）
-  translate_to_zh: false    # 是否将外文标题/摘要翻译为中文（需 AI key）
+  max_age_hours: 48         # 超过此时长的旧闻直接剔除（保证"每日"新鲜度）
+  translate_to_zh: false    # 源已全部为中文，无需翻译
   keywords_boost:           # 你关心的关键词，命中加权（提升相关性）
     - AI
+    - 大模型
     - 芯片
+    - 机器人
     - 气候
     - 经济
-  keywords_block:           # 你不想看到的词，命中则降权/剔除
-    - 明星八卦
+    - 科研
+  keywords_block:           # 命中则降权（过滤低信息量/营销内容）
+    - 图集
+    - 组图
+    - 直播回顾
+    - 抽奖
+    - 优惠
+    - 促销
     - 广告
+    - 明星八卦
+    - 星座运势
 
 # —— 推送渠道（全部可选；都留空 => 仅生成移动端网页）——
 notify:
@@ -33,65 +50,67 @@ notify:
 
 # —— 领域与来源（路由式注册，新增源只加条目）——
 # authority: 来源权威度权重(0-1)；weight: 该源条目相对权重
+# 注释中的「实测」= 本地探测到的 24h 内新条目数 / RSS 摘要平均字数
 categories:
   - id: tech_ai
     name: "科技与 AI"
     enabled: true
     authority: 1.0
     sources:
-      - {name: "Hacker News",        url: "https://hnrss.org/frontpage",                     weight: 1.0}
-      - {name: "The Verge",          url: "https://www.theverge.com/rss/index.xml",         weight: 0.9}
-      - {name: "MIT Tech Review",    url: "https://www.technologyreview.com/feed/",         weight: 1.0}
-      - {name: "Ars Technica",       url: "http://feeds.arstechnica.com/arstechnica/index", weight: 0.9}
-      - {name: "少数派",              url: "https://sspai.com/feed",                         weight: 0.8}
-      - {name: "机器之心",            url: "https://www.jiqizhixin.com/rss",                 weight: 0.9}
+      - {name: "Solidot",   url: "https://www.solidot.org/index.rss",  weight: 1.0}   # 实测 11条/384字
+      - {name: "量子位",     url: "https://www.qbitai.com/feed",        weight: 0.95}  # 实测 10条/AI垂直
+      - {name: "雷锋网",     url: "https://www.leiphone.com/feed",      weight: 0.95}  # 实测 15条/3935字 全文输出
+      - {name: "IT之家",     url: "https://www.ithome.com/rss/",        weight: 0.9}   # 实测 60条/609字
+      - {name: "爱范儿",     url: "https://www.ifanr.com/feed",         weight: 0.85}  # 实测 13条/88字
+      - {name: "少数派",     url: "https://sspai.com/feed",             weight: 0.85}  # 实测 5条/深度评测
+      - {name: "开源中国",   url: "https://www.oschina.net/news/rss",   weight: 0.75}  # 实测 12条/180字
+      - {name: "InfoQ",     url: "https://www.infoq.cn/feed",          weight: 0.7}   # 实测 13条/摘要极短
 
   - id: finance
     name: "财经与商业"
     enabled: true
     authority: 0.95
     sources:
-      - {name: "The Economist (Markets)", url: "https://www.economist.com/finance-and-economics/rss.xml", weight: 1.0}
-      - {name: "NPR Business",            url: "https://feeds.npr.org/1032/rss.xml",                       weight: 0.8}
-      - {name: "BBC Business",            url: "https://feeds.bbci.co.uk/news/business/rss.xml",           weight: 0.9}
-      - {name: "Fortune",                 url: "https://fortune.com/feed",                                weight: 0.8}
+      - {name: "华尔街见闻", url: "https://rsshub.rssforever.com/wallstreetcn/news/global", weight: 1.0}   # 实测 35条/1864字
+      - {name: "财新网",     url: "https://rsshub.rssforever.com/caixin/latest",            weight: 1.0}   # 实测 20条/349字
+      - {name: "界面新闻",   url: "https://a.jiemian.com/index.php?m=article&a=rss",        weight: 0.9}   # 实测 30条
+      - {name: "经济观察网", url: "http://www.eeo.com.cn/rss.xml",                          weight: 0.9}   # 实测 11条/182字
+      - {name: "虎嗅",       url: "https://rsshub.rssforever.com/huxiu/moment",             weight: 0.85}  # 实测 20条/325字
+      - {name: "钛媒体",     url: "https://www.tmtpost.com/feed",                           weight: 0.85}  # 实测 18条
+      - {name: "中新财经",   url: "https://www.chinanews.com.cn/rss/finance.xml",           weight: 0.85}  # 实测 30条/106字
+      - {name: "36氪",       url: "https://rsshub.rssforever.com/36kr/newsflashes",         weight: 0.7}   # 实测 20条/快讯偏浅
 
+  # 说明：中文「纯国际新闻」RSS 源稀缺（参考消息/环球网/央视等均已停用 RSS），
+  # 故本领域定位为「时事与国际」：中新国际提供境外动态，澎湃时事提供国内要闻深度。
   - id: world
-    name: "国际与地缘"
+    name: "时事与国际"
     enabled: true
     authority: 0.95
     sources:
-      - {name: "BBC World",      url: "https://feeds.bbci.co.uk/news/world/rss.xml",  weight: 0.9}
-      - {name: "The Guardian",   url: "https://www.theguardian.com/world/rss",       weight: 1.0}
-      - {name: "NPR News",       url: "https://feeds.npr.org/1001/rss.xml",          weight: 0.8}
-      - {name: "Al Jazeera",     url: "https://www.aljazeera.com/xml/rss/all.xml",   weight: 0.9}
-      - {name: "DW English",     url: "https://rss.dw.com/rdf/rss-en-all",           weight: 0.8}
+      - {name: "中新国际",   url: "https://www.chinanews.com.cn/rss/world.xml",        weight: 1.0}   # 实测 30条/境外动态
+      - {name: "澎湃时事",   url: "https://rsshub.rssforever.com/thepaper/list/25462", weight: 0.95}  # 实测 10条/1978字 深度
 
   - id: science
-    name: "科学与自然"
+    name: "科学与健康"
     enabled: true
     authority: 1.0
     sources:
-      - {name: "Nature",              url: "https://www.nature.com/nature.rss",              weight: 1.0}
-      - {name: "Science Daily",       url: "https://www.sciencedaily.com/rss/all.xml",       weight: 0.9}
-      - {name: "Scientific American", url: "https://www.scientificamerican.com/feed/",       weight: 0.9}
-      - {name: "Quanta",              url: "https://www.quantamagazine.org/feed/",           weight: 1.0}
+      - {name: "果壳科学人", url: "https://rsshub.rssforever.com/guokr/scientific", weight: 1.0}   # 实测 7条/3691字 长文
+      - {name: "中新健康",   url: "https://www.chinanews.com.cn/rss/health.xml",    weight: 0.85}  # 实测 12条/72字
 
   - id: culture
     name: "文化与思想"
     enabled: true
     authority: 0.9
     sources:
-      - {name: "The Atlantic", url: "https://www.theatlantic.com/feed/all/", weight: 1.0}
-      - {name: "Aeon",         url: "https://aeon.co/feed",                   weight: 0.9}
-      - {name: "NYR Books",    url: "https://www.nybooks.com/feed/",          weight: 0.9}
-      - {name: "NPR Arts",     url: "https://feeds.npr.org/1039/rss.xml",     weight: 0.7}
+      - {name: "豆瓣书评",   url: "https://www.douban.com/feed/review/book",           weight: 0.95}  # 实测 172字 书评
+      - {name: "澎湃文化",   url: "https://rsshub.rssforever.com/thepaper/list/25488", weight: 0.9}   # 实测 5条
+      - {name: "豆瓣影评",   url: "https://www.douban.com/feed/review/movie",          weight: 0.8}   # 实测 10条/用户长评，质量参差故降权
 
   - id: society
     name: "社会与深度"
     enabled: true
     authority: 0.9
     sources:
-      - {name: "ProPublica",       url: "https://www.propublica.org/feeds/propublica/main", weight: 1.0}
-      - {name: "The Conversation", url: "https://theconversation.com/us/articles.atom",     weight: 0.9}
-      - {name: "BBC",             url: "https://feeds.bbci.co.uk/news/rss.xml",             weight: 0.8}
+      - {name: "澎湃精选",   url: "https://rsshub.rssforever.com/thepaper/featured", weight: 1.0}   # 实测 18条/994字 深度
+      - {name: "中新滚动",   url: "https://www.chinanews.com.cn/rss/scroll-news.xml", weight: 0.9}  # 实测 30条/92字
