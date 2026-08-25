@@ -15,12 +15,13 @@ TEMPLATE = os.path.join(ROOT, "frontend", "index.html")
 PLACEHOLDER = "/*__DIGEST_JSON__*/null"
 
 
-def build_digest(items: list[dict]) -> dict:
+def build_digest(items: list[dict], categories_cfg: list[dict] | None = None) -> dict:
     cats: dict[str, dict] = {}
     out = []
     for it in items:
-        cats.setdefault(it["_category"], {"id": it["_category"], "name": it["_cat_name"], "count": 0})
-        cats[it["_category"]]["count"] += 1
+        cid = it["_category"]
+        cats.setdefault(cid, {"id": cid, "name": it["_cat_name"], "count": 0})
+        cats[cid]["count"] += 1
         out.append(
             {
                 "title": it.get("title", ""),
@@ -36,11 +37,21 @@ def build_digest(items: list[dict]) -> dict:
                 "ai": it.get("ai", False),
             }
         )
+    # 始终保留配置里的全部分类（即使当天无内容也保留，count=0），
+    # 保证底部导航标签数量稳定，不会因个别源偶发失败而忽多忽少。
+    if categories_cfg:
+        cat_list = [
+            {"id": c["id"], "name": c.get("name", c["id"]),
+             "count": cats.get(c["id"], {}).get("count", 0)}
+            for c in categories_cfg
+        ]
+    else:
+        cat_list = sorted(cats.values(), key=lambda c: -c["count"])
     return {
         "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "total": len(out),
-        "categories": sorted(cats.values(), key=lambda c: -c["count"]),
+        "categories": cat_list,
         "items": out,
     }
 

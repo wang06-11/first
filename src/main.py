@@ -78,7 +78,7 @@ def run_once(cfg: NewsPulseConfig, page_url: str = "") -> dict:
         sm = summarizer.summarize(it["title"], it.get("summary", ""), ai_key, model, translate)
         it.update(sm)
 
-    digest = generator.build_digest(selected)
+    digest = generator.build_digest(selected, cfg.categories)
     digest["page_url"] = page_url
     generator.write(digest)
     notifier.notify_all(cfg.notify, digest)

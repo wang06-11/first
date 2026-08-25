@@ -88,6 +88,7 @@ categories:
     authority: 0.95
     sources:
       - {name: "中新国际",   url: "https://www.chinanews.com.cn/rss/world.xml",        weight: 1.0}   # 实测 30条/境外动态
+      - {name: "中新国内",   url: "https://www.chinanews.com.cn/rss/china.xml",        weight: 0.95}  # 实测 30条/国内要闻（直接源，RSSHub 超时也兜底）
       - {name: "澎湃时事",   url: "https://rsshub.rssforever.com/thepaper/list/25462", weight: 0.95}  # 实测 10条/1978字 深度
 
   - id: science
@@ -114,3 +115,4 @@ categories:
     sources:
       - {name: "澎湃精选",   url: "https://rsshub.rssforever.com/thepaper/featured", weight: 1.0}   # 实测 18条/994字 深度
       - {name: "中新滚动",   url: "https://www.chinanews.com.cn/rss/scroll-news.xml", weight: 0.9}  # 实测 30条/92字
+      - {name: "中新社会",   url: "https://www.chinanews.com.cn/rss/society.xml",    weight: 0.95}  # 实测 30条/社会民生（直接源兜底）

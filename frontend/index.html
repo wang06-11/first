@@ -214,11 +214,12 @@ function render(){
     document.getElementById("emptyMsg").textContent="请先运行生成，或访问最新 data/latest.html。";
     document.getElementById("empty").hidden=false; document.getElementById("list").innerHTML=""; return; }
   const cats = DATA.categories||[];
+  const withContent = cats.filter(c=>c.count>0).length;
   // 顶部日期标签
   document.getElementById("dateLabel").textContent = isToday(DATA.date) ? "今天" : fmtDate(DATA.date);
   // 日头部
   let head = `<div class="dayhead"><span class="d">${esc(isToday(DATA.date)?"今日资讯":fmtDate(DATA.date))}</span>`+
-             `<span class="m">共 ${DATA.total} 条 · 覆盖 ${cats.length} 个领域${DATA.items[0]&&DATA.items[0].ai?" · AI 摘要":""}</span></div>`;
+             `<span class="m">共 ${DATA.total} 条 · ${withContent} 个领域有内容${DATA.items[0]&&DATA.items[0].ai?" · AI 摘要":""}</span></div>`;
   // 列表过滤（按底部选中的分类）
   let items=(DATA.items||[]);
   if(activeCat!=="all") items=items.filter(it=>it.category===activeCat);
