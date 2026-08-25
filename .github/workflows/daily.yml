@@ -60,6 +60,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/history/ || true
           git diff --cached --quiet || git commit -m "chore: update seen history $(date +%F)"
+          # rebase onto latest main in case another workflow/push advanced it (e.g. re-runs)
+          git pull --rebase origin main
           git push
 
       - name: Add index.html redirect
