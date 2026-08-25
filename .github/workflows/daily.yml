@@ -20,7 +20,7 @@ on:
   workflow_dispatch: {}
 
 permissions:
-  contents: write        # 回写 history/ 保证跨日去重
+  contents: read         # 检出代码
   pages: write           # 部署 Pages
   id-token: write
 
@@ -34,6 +34,15 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+
+      # 跨日去重历史用 Actions Cache 持久化，避免在 runner 里 git push 冲突
+      - name: Restore seen-history cache
+        uses: actions/cache@v4
+        with:
+          path: data/history/seen.json
+          key: newspulse-seen-${{ github.run_id }}
+          restore-keys: |
+            newspulse-seen-
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -53,16 +62,6 @@ jobs:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
           PAGE_URL: ${{ secrets.PAGE_URL }}
         run: python run.py --once
-
-      - name: Persist seen-history (cross-day dedup)
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/history/ || true
-          git diff --cached --quiet || git commit -m "chore: update seen history $(date +%F)"
-          # rebase onto latest main in case another workflow/push advanced it (e.g. re-runs)
-          git pull --rebase origin main
-          git push
 
       - name: Add index.html redirect
         run: cp data/latest.html data/index.html
