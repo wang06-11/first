@@ -6,4 +6,5 @@ __pycache__/
 venv/
 # 运行时数据（latest.* 可提交以便静态托管）
 data/*.html.bak
-# data/history/seen.json 用于跨日去重，必须持久化，故不忽略
+# 去重历史现在由 Actions Cache 持久化，不再提交到仓库
+data/history/
