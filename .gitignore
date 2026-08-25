@@ -8,3 +8,6 @@ venv/
 data/*.html.bak
 # 去重历史现在由 Actions Cache 持久化，不再提交到仓库
 data/history/
+# 每日归档（data/archive/<日期>.json + index.json）由生成器在每次运行时写出，
+# 并随 GitHub Pages 的 data/ 目录一起发布；属运行时产物，不进仓库。
+data/archive/

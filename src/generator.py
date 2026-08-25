@@ -64,4 +64,34 @@ def write(digest: dict) -> tuple[str, str]:
     with open(html_path, "w", encoding="utf-8") as f:
         f.write(html)
     logging.info("[generate] 写出 latest.json / latest.html（%d 条）", digest["total"])
+    _write_archive(digest)
     return json_path, html_path
+
+
+def _write_archive(digest: dict):
+    """把每日 digest 落盘到 data/archive/<日期>.json，并维护 index.json。
+
+    前端日期选择器据此回看任意一天；归档随 GitHub Pages 的 data/ 目录一起发布。
+    """
+    date = digest.get("date")
+    if not date:
+        return
+    arch_dir = os.path.join(DATA_DIR, "archive")
+    os.makedirs(arch_dir, exist_ok=True)
+    arc_path = os.path.join(arch_dir, f"{date}.json")
+    with open(arc_path, "w", encoding="utf-8") as f:
+        json.dump(digest, f, ensure_ascii=False, indent=2)
+    # 维护升序去重的日期索引
+    idx_path = os.path.join(arch_dir, "index.json")
+    dates: list[str] = []
+    if os.path.exists(idx_path):
+        try:
+            dates = json.load(open(idx_path, encoding="utf-8"))
+        except Exception:
+            dates = []
+    if date not in dates:
+        dates.append(date)
+    dates = sorted(set(dates))
+    with open(idx_path, "w", encoding="utf-8") as f:
+        json.dump(dates, f, ensure_ascii=False, indent=2)
+    logging.info("[generate] 归档 %s.json（共 %d 个归档日）", date, len(dates))
