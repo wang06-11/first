@@ -85,7 +85,7 @@ python run.py --once
 ```yaml
 schedule:
   timezone: "Asia/Shanghai"
-  hour: 8          # 每天 08:00 推送
+  hour: 12         # 每天 12:00 推送（中午）
   minute: 0
 preferences:
   max_total: 36
@@ -108,7 +108,7 @@ preferences:
 **A. GitHub Actions（推荐，免费稳定）**
 1. 把仓库推到 GitHub
 2. `Settings → Secrets` 添加：`OPENROUTER_API_KEY`、`NTFY_TOPIC`、`TELEGRAM_TOKEN`、`TELEGRAM_CHAT_ID`、`PAGE_URL`（可选）
-3. 每天 UTC 00:00（北京 08:00）自动运行并把结果提交回 `data/`
+3. 每天 UTC 04:00（北京 12:00 中午）自动运行并把结果提交回 `data/`
 4. 若用方式 B 托管，把托管后的 `latest.html` 链接填进 `PAGE_URL`，推送文案里就会带可点链接
 > 改时间：编辑 `.github/workflows/daily.yml` 里的 `cron`（UTC）。
 

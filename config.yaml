@@ -12,7 +12,7 @@
 # —— 推送与定时（稳定调度：GitHub Actions 或本地 APScheduler）——
 schedule:
   timezone: "Asia/Shanghai"   # 时区，决定推送时刻
-  hour: 8                      # 每天推送小时（0-23）
+  hour: 12                     # 每天推送小时（0-23，12=中午）
   minute: 0                    # 分钟（0-59）
 
 # —— 内容偏好（多领域 + 深度 + 个性化）——
